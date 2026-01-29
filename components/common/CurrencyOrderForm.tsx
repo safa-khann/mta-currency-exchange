@@ -433,7 +433,7 @@ const handleSubmitOrder = async () => {
       {/* 80% width box */}     
       <div className=" w-[95%] sm:w-[90%] 2xl:w-[70%] p-4 pt-4 pb-6 md:p-5 lg:px-6 lg:pt-5 lg:pb-3 absolute top-[-120px] left-1/2 transform -translate-x-1/2 z-20 mx-auto bg-white shadow-equal-sm" style={{borderRadius:'50px'}}>
         {/* Heading */}
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-5 md:mb-8">{heading}</h2>          
+        <h2 className="text-xl sm:text-3xl font-bold text-center mb-5 md:mb-8">{heading}</h2>          
            <div className="flex flex-col flex-wrap sm:flex-row justify-center gap-2 md:gap-3 md:mb-4 lg:mb-6">
         {/* Buy/Sell Option Select */}
         <div className="p-2 flex font-medium border h-9.5 bg-grayblue-l">
@@ -454,7 +454,7 @@ const handleSubmitOrder = async () => {
 
         {/* Currency Select with Flag */}
         {isLoading ? (  
-            <div className="animate-pulse h-9.5 w-12 bg-gray-200 rounded"></div>
+            <div className="animate-pulse h-9.5 w-full sm:w-12 bg-gray-200 rounded"></div>
           ) : error ? (
             <div className="flex w-full sm:w-auto h-9.5 items-center border bg-grayblue-l px-2 overflow-hidden justify-center">
               <span className="text-xs text-red-500">Error </span>
@@ -539,8 +539,8 @@ const handleSubmitOrder = async () => {
       
         {/* Personal Details Section - Hidden if prop is false */}
         {showPersonalDetails && (    
-          <div className="pt-5 px-3 sm:px-10">
-            <h3 className="text-2xl sm:text-3xl font-bold mb-3">Your Personal Details</h3>
+          <div className="pt-15 sm:pt-5 px-3 sm:px-10">
+            <h3 className="text-xl sm:text-3xl font-bold mb-3">Your Personal Details</h3>
              {isOrderSuccess && (
              <div 
                 ref={successMessageRef}

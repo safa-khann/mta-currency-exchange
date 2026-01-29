@@ -10,11 +10,11 @@ export default function PrivacyPolicy() {
         <div className="space-y-10">
           {/* Confidentiality and Security Section */}
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            <h2 className="text-2xl font-bold text-black mb-4">
               Confidentiality and Security
             </h2>
             <div className="space-y-3">
-              <p className="text-justify fw-medium">
+              <p className="text-justify fw-medium text-sm sm:text-base">
                 Your personal data is kept confidential and is only accessible to authorized
                 individuals who need it for business purposes.
                 We use appropriate administrative, technical, and physical security measures 
@@ -26,10 +26,10 @@ export default function PrivacyPolicy() {
 
           {/* Data Sharing Section */}
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            <h2 className="text-2xl font-bold text-black mb-4">
               Data Sharing
             </h2>
-            <div className="space-y-3 fw-medium text-justify">
+            <div className="space-y-3 fw-medium text-sm sm:text-base text-justify">
               <p>
                 We share personal data with third parties only when required to deliver our services,
                 comply with the law, or when you have given your consent. We do not sell or use your personal data for third party marketing without 
@@ -42,10 +42,10 @@ export default function PrivacyPolicy() {
 
           {/* Your Data Rights Section */}
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            <h2 className="text-2xl font-bold text-black mb-4">
               Your Data Rights
             </h2>
-            <div className="space-y-3 fw-medium text-justify">
+            <div className="space-y-3 fw-medium text-sm sm:text-base text-justify">
               <p>
                 You have the right to access the personal data we hold about you. 
                 You may request corrections if your data is inaccurate or incomplete. You may also request deletion of your personal data where there is 
@@ -57,10 +57,10 @@ export default function PrivacyPolicy() {
 
           {/* Accountability Section */}
           <section>
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            <h2 className="text-2xl font-bold text-black mb-4">
               Accountability
             </h2>
-            <div className="space-y-4 fw-medium text-justify">
+            <div className="space-y-4 fw-medium text-sm sm:text-base text-justify">
               <p className="mb-0">
                 MTA Worldwide is committed to following this Privacy Policy at all times. 
                 We ensure that our employees, contractors, partners, and service providers 

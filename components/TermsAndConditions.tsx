@@ -10,20 +10,18 @@ export default function TermsAndConditions() {
         <div className="space-y-10">
           {/* Confidentiality and Security Section */}
           <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl   font-bold text-black mb-4">
               1. Agreement
             </h2>
             <div className="space-y-3">
-              <p className="text-justify fw-medium">
+              <p className="text-justify text-sm sm:text-base fw-medium">
                 MTA Worldwide Limited, trading as MTA Worldwide, is registered in England. MTА
                 Worldwide provides foreign currency exchange services, including Click and Collect,
-                Home Delivery, and Click and Sell (the "Service").</p>
-               <p>
+                Home Delivery, and Click and Sell (the "Service").<br/>
                 Our registered address is 54-56 High Street, Grays, RM17 6NA, United Kingdom.
                 Throughout these terms, "MTA Worldwide", "we", "us", or "our" refers to MTA
                 Worldwide Limited.
-                </p>
-                <p>
+                <br/>
                 "You" or "your" refers to the person using the Service.<br></br>
                 "Business Day" means the branch opening times shown on our website.<br/>
                 These online terms and conditions apply to the use of the Service.
@@ -33,10 +31,10 @@ export default function TermsAndConditions() {
 
           {/* Data Sharing Section */}
           <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">
               2. Use of the Website
             </h2>
-            <div className="space-y-3 fw-medium text-justify">
+            <div className="space-y-3 text-sm sm:text-base fw-medium text-justify">
               <p>
                 MTA Worldwide operates this website. By using the website, you confirm that you
                 have read and agreed to these terms and conditions. If you do not agree, please do
@@ -48,10 +46,10 @@ export default function TermsAndConditions() {
 
           {/* Your Data Rights Section */}
           <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">
               3. Service
             </h2>
-            <div className="space-y-3 fw-medium text-justify">
+            <div className="space-y-3 text-sm sm:text-base fw-medium text-justify">
               <p>
                 The Service is available only to individuals aged 18 or over who live in and access the
                 Service from the United Kingdom. <br/>
@@ -75,10 +73,10 @@ export default function TermsAndConditions() {
 
           {/* button know more */}
           <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">
               4. Delivery and Collection
             </h2>
-            <div className="space-y-4 fw-medium text-justify">
+            <div className="space-y-4 text-sm sm:text-base fw-medium text-justify">
               By placing an order, you confirm that you are acting on your own behalf and for a lawful purpose. You confirm that any currency you buy or sell is legally yours and has not been obtained through illegal activity.<br/>
                 You also confirm that all information you provide is accurate and complete and that you will provide any additional information we may reasonably request.
                 <br/>
@@ -89,10 +87,10 @@ export default function TermsAndConditions() {
             </div>
           </section>
           <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">
               5. Cancellations and Refunds
             </h2>
-            <div className="space-y-4 fw-medium text-justify">
+            <div className="space-y-4 text-sm sm:text-base fw-medium text-justify">
               You may cancel your order before collection by contacting us on +44 1375 413554 or by emailing mtaworldwidelimited@gmail.com.
               <br/>
             Refunds will be made using the same payment method used for the original transaction. Refunds may take up to 20 days, depending on your card provider. Delivery charges are non refundable once the order has been dispatched.
@@ -101,20 +99,20 @@ export default function TermsAndConditions() {
             </div>
           </section>
           <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">
               6. Buy Back
             </h2>
-            <div className="space-y-4 fw-medium text-justify">
+            <div className="space-y-4 text-sm sm:text-base fw-medium text-justify">
               You may sell unused foreign currency to us using our Service. You do not need to have originally purchased the currency from MTA Worldwide.
               <br/>
            </div>
           </section>
           {/* button here */}
           <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">
               7. Currencies Accepted
             </h2>
-            <div className="space-y-4 fw-medium text-justify">
+            <div className="space-y-4 text-sm sm:text-base fw-medium text-justify">
               We buy currencies listed on our website in note form only. Coins are not accepted.<br/>
               Scottish notes are not normally accepted. We may accept them at our discretion, subject to a 2 percent adjustment.<br/>
               <br/>
@@ -123,19 +121,19 @@ export default function TermsAndConditions() {
            </div>
           </section>
           <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">
               8. Identification Requirements
             </h2>
-            <div className="space-y-4 fw-medium text-justify">
+            <div className="space-y-4 text-sm sm:text-base fw-medium text-justify">
               Valid identification is required for card payments in store, regardless of the amount. Accepted ID includes a valid passport, UK driving licence, or European national ID.<br/>
               For cash transactions above the required threshold, we will register the customer and scan their identification as required by law.
            </div>
           </section>
           <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl   font-bold text-black mb-4">
               9. Complaints and Feedback
             </h2>
-            <div className="space-y-4 fw-medium text-justify">              
+            <div className="space-y-4 text-sm sm:text-base fw-medium text-justify">              
               We value your feedback. If you wish to make a complaint, please contact us by phone, email, or in writing.<br/><br/>
               <strong>Address: </strong>54–56 High Street, Grays, RM17 6NA<br/>
               <strong>Phone: </strong>+44 1375 413554<br/>
@@ -143,47 +141,47 @@ export default function TermsAndConditions() {
            </div>
           </section>
           <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl   font-bold text-black mb-4">
               10. Payment Methods
             </h2>
-            <div className="space-y-4 fw-medium text-justify">
+            <div className="space-y-4 text-sm sm:text-base fw-medium text-justify">
               Payment can be made by card or cash.<br/>
               Cheques are not accepted. Any cheque payments received will result in the order being placed on hold.
            </div>
           </section>
             <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl   font-bold text-black mb-4">
               11. Charges
             </h2>
-            <div className="space-y-4 fw-medium text-justify">
+            <div className="space-y-4 text-sm sm:text-base fw-medium text-justify">
               Visa debit card payments are charged at 0 percent. Charges may apply to some credit cards, business cards, and international cards. Some cards are not accepted. Please contact customer service for confirmation.<br/>
               We reserve the right to cancel or refuse any transaction that does not meet regulatory requirements. 
             </div>
           </section>
           {/* know more button */}
            <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl   font-bold text-black mb-4">
               12. Changes to These Terms
             </h2>
-            <div className="space-y-4 fw-medium text-justify">
+            <div className="space-y-4 text-sm sm:text-base fw-medium text-justify">
             We may change, suspend, or withdraw the Service or these terms at any time without prior notice. Updated terms will be posted on the website. Continued use of the website or Service means you accept the updated terms.
             </div>
           </section>
            <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl   font-bold text-black mb-4">
              13. Disclaimer
             </h2>
-            <div className="space-y-4 fw-medium text-justify">
+            <div className="space-y-4 text-sm sm:text-base fw-medium text-justify">
               All information provided is for general purposes only and does not constitute financial advice. MTA Worldwide is not responsible for decisions made based on information provided through the Service.<br/><br/>
 
               If an incorrect rate is quoted, we will contact you with the correct rate and give you the option to proceed or cancel.
             </div>
           </section>
            <section>
-            <h2 className="text-xl sm:text-2xl   font-semibold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl   font-bold text-black mb-4">
               14. Contact Us
             </h2>
-            <div className="space-y-4 fw-medium text-justify">
+            <div className="space-y-4 text-sm sm:text-base fw-medium text-justify">
                 Phone: +44 1375 413554<br/>
                 Email: mtaworldwidelimited@gmail.com<br/><br/>
 

@@ -66,14 +66,14 @@ const ContactPage = () => {
             </div>
             </div></div>
 
-            <h2 className='text-center font-bold mb-4 text-2xl'>Follow Our Social Media</h2>
+            <h2 className='text-center font-bold mb-4 text-xl sm:text-2xl'>Follow Our Social Media</h2>
             <SocialLinks className='w-5 h-5 text-white' circleClass='bg-darkbluegray w-8 h-8 '/>
 
             <div className='text-center bg-yellow-500/30 my-12 py-8 sm:py-15 sm:px-4'>
-            <h2 className='text-center font-bold mb-5 text-3xl'>Working Hours</h2>
-            <p className='text-center font-bold text-xl inline'>Monday to Saturday: </p><span className='text-xl font-medium block sm:inline'> 9:00am to 6:00pm</span>
+            <h2 className='text-center font-bold mb-5 text-xl sm:text-3xl'>Working Hours</h2>
+            <p className='text-center font-bold text-md sm:text-xl inline'>Monday to Saturday: </p><span className='text-sm sm:text-xl font-medium block sm:inline'> 9:00am to 6:00pm</span>
             </div>
-            <h2 className='text-center font-bold text-3xl mt-8 mb-8'>Locate Us</h2>
+            <h2 className='text-center font-bold text-xl sm:text-3xl mt-8 mb-8'>Locate Us</h2>
             <SimpleMap/>
             <div className='w-full bg-white mt-[-18px] h-10 absolute z-80 mb-20'></div>
             </>
