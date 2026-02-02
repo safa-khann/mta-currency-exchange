@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     // Generate order number
     const orderNumber = `ORD-${Date.now().toString().slice(-8)}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
-
+    const domain = process.env.NEXT_PUBLIC_APP_URL || 'https://localhost:3000';
     // Customer email with items array
     const customerHtml = generateCustomerEmailHTML(orderData, orderNumber);
     
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
       html: customerHtml,
       attachments: [{
       filename: 'logo-wid.png',
-      path: './public/images/logo-wid.png', // Path to your logo
+      path: `${domain}/images/logo-wid.png`, // Path to your logo
       cid: 'mtalogo' // Same cid value as in the HTML img src
     }]
     });
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       html: adminHtml,
       attachments: [{
       filename: 'logo-wid.png',
-      path: './public/images/logo-wid.png', // Path to your logo
+      path: `${domain}/images/logo-wid.png`, // Path to your logo
       cid: 'mtalogo' // Same cid value as in the HTML img src
     }]
     });
