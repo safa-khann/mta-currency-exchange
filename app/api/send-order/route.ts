@@ -68,33 +68,33 @@ export async function POST(request: NextRequest) {
     const orderNumber = `ORD-${Date.now().toString().slice(-8)}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
     const domain = process.env.NEXT_PUBLIC_APP_URL || 'https://localhost:3000';
     // Customer email with items array
-    const customerHtml = generateCustomerEmailHTML(orderData, orderNumber);
+    const customerHtml = generateCustomerEmailHTML(orderData, orderNumber,domain);
     
     await transporter.sendMail({
       from: `"MTA Currency Exchange" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
       to: orderData.email,
       subject: `✅ Order Confirmation - ${orderNumber}`,
-      html: customerHtml,
-      attachments: [{
-      filename: 'logo-wid.png',
-      path: `${domain}/images/logo-wid.png`, // Path to your logo
-      cid: 'mtalogo' // Same cid value as in the HTML img src
-    }]
+      html: customerHtml
+    //   attachments: [{
+    //   filename: 'logo-wid.png',
+    //   path: `${domain}/images/logo-wid.png`, // Path to your logo
+    //   cid: 'mtalogo' // Same cid value as in the HTML img src
+    // }]
     });
 
     // Admin email with items array
-    const adminHtml = generateAdminEmailHTML(orderData, orderNumber);
+    const adminHtml = generateAdminEmailHTML(orderData, orderNumber,domain);
     
     await transporter.sendMail({
       from: `"MTA Currency Exchange" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_FROM || 'mtaworldwidelimited@gmail.com',
       subject: `📋 New Order ${orderNumber}: ${orderData.first_name} ${orderData.last_name} - ${orderData.items.length} item(s)`,
-      html: adminHtml,
-      attachments: [{
-      filename: 'logo-wid.png',
-      path: `${domain}/images/logo-wid.png`, // Path to your logo
-      cid: 'mtalogo' // Same cid value as in the HTML img src
-    }]
+      html: adminHtml
+    //   attachments: [{
+    //   filename: 'logo-wid.png',
+    //   path: `${domain}/images/logo-wid.png`, // Path to your logo
+    //   cid: 'mtalogo' // Same cid value as in the HTML img src
+    // }]
     });
 
     return NextResponse.json({
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
   }
 }
 // Email template functions
-function generateCustomerEmailHTML(orderData: any, orderNumber: string): string {
+function generateCustomerEmailHTML(orderData: any, orderNumber: string, domain: string): string {
   // Calculate totals
   const totalGBP = orderData.items.reduce((sum: number, item: any) => 
     sum + (item.gbp_amount || 0), 0);
@@ -402,7 +402,7 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
         <!-- Email Header with Logo -->
         <div class="email-header">
             <div class="logo-container">
-              <img src="cid:mtalogo" 
+              <img src="${domain}/images/logo-wid.png" 
                 alt="MTA Logo" 
                 style="max-height: 40px; width: auto; display:inline-block;"
                 width="120"
@@ -509,7 +509,7 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
   `;
 }
 
-function generateAdminEmailHTML(orderData: any, orderNumber: string): string {
+function generateAdminEmailHTML(orderData: any, orderNumber: string, domain: string): string {
   // Calculate totals
   const totalGBP = orderData.items.reduce((sum: number, item: any) => 
     sum + (item.gbp_amount || 0), 0);
@@ -695,7 +695,7 @@ function generateAdminEmailHTML(orderData: any, orderNumber: string): string {
     <body>
       <div class="container">
         <div class="header">
-        <img src="cid:mtalogo" 
+        <img src="${domain}/images/logo-wid.png"
                 alt="MTA Logo" 
                 style="max-height: 30px; width: auto;"
                 width="120"
