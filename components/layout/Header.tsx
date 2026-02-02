@@ -139,7 +139,7 @@ export default function Header() {
                             </a>
                           </li>
                           <li>
-                            <a href="/money-exchange/exchange-rates" className="text-gray-600 hover:text-blue-600 transition-colors text-sm block py-1">
+                            <a href="/money-exchange/currency-exchange-rates" className="text-gray-600 hover:text-blue-600 transition-colors text-sm block py-1">
                               Exchange Rates
                             </a>
                           </li>
@@ -195,7 +195,7 @@ export default function Header() {
           }`}
         >
           {/* Menu Header */}
-          <div className="flex items-center justify-between p-4">
+          <div className="flex items-center justify-between p-5">
            
             <div className="flex gap-2 items-center">
               <Image
@@ -216,7 +216,7 @@ export default function Header() {
           </div>
 
           {/* Menu Content */}
-          <div className="px-6 overflow-y-auto h-[calc(100%-80px)]">
+          <div className="px-7 overflow-y-auto h-[calc(100%-80px)]">
             {/* Money Exchange Section */}
             <div className="mb-8">
               <h3 className="font-bold text-gray-900 mb-4 text-lg border-b border-yellow-400 pb-1">
@@ -239,7 +239,7 @@ export default function Header() {
                   </a>
                 </li>
                 <li>
-                  <a href="/money-exchange/exchange-rates" className="text-black hover:text-blue-600 transition-colors block px-2 rounded-lg hover:bg-gray-50">
+                  <a href="/money-exchange/currency-exchange-rates" className="text-black hover:text-blue-600 transition-colors block px-2 rounded-lg hover:bg-gray-50">
                     <ChevronRight className='inline' size={15}/> Exchange Rates
                   </a>
                 </li>

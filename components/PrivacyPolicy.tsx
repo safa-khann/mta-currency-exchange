@@ -10,7 +10,7 @@ export default function PrivacyPolicy() {
         <div className="space-y-10">
           {/* Confidentiality and Security Section */}
           <section>
-            <h2 className="text-2xl font-bold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">
               Confidentiality and Security
             </h2>
             <div className="space-y-3">
@@ -26,7 +26,7 @@ export default function PrivacyPolicy() {
 
           {/* Data Sharing Section */}
           <section>
-            <h2 className="text-2xl font-bold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">
               Data Sharing
             </h2>
             <div className="space-y-3 fw-medium text-sm sm:text-base text-justify">
@@ -42,7 +42,7 @@ export default function PrivacyPolicy() {
 
           {/* Your Data Rights Section */}
           <section>
-            <h2 className="text-2xl font-bold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">
               Your Data Rights
             </h2>
             <div className="space-y-3 fw-medium text-sm sm:text-base text-justify">
@@ -57,7 +57,7 @@ export default function PrivacyPolicy() {
 
           {/* Accountability Section */}
           <section>
-            <h2 className="text-2xl font-bold text-black mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">
               Accountability
             </h2>
             <div className="space-y-4 fw-medium text-sm sm:text-base text-justify">

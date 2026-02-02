@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import HeroSection from './common/HeroSection';
+import Link from 'next/link';
 
 // Type for team service
 interface MTAServices {
@@ -37,7 +38,7 @@ const AboutUs = () => {
     {
       id: 4,
       name: 'Money Transfer',
-      url: 'money-exchange/exchange-rates',
+      url: '/#money-transfer',
       description: 'Begin your international money transfer  online, on the app or pay in person, to receivers around the world. It’s Quick, Safe, Fast, and Easier.',
       imageUrl: '/images/Transfer money internationlly today at MTA.jpg',
     },
@@ -51,7 +52,7 @@ const AboutUs = () => {
     {
       id: 6,
       name: 'Exchange Rates',
-      url: 'money-exchange/exchange-rates',
+      url: 'money-exchange/currency-exchange-rates',
       description: 'Save up to 5% by getting the preferential exchange rates on your foreign exchange services. Simply visit any one of our branch and you.',
       imageUrl: '/images/Save 5 percent on selling and buying currency online.jpg',
     },
@@ -63,16 +64,16 @@ const AboutUs = () => {
       {/* Hero Section */}
       <section className=" px-3 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <h2 className="text-2xl sm:text-3xl 2xl:text-6xl font-bold text-gray-900 mb-6">
+          <h2 className="text-xl sm:text-3xl 2xl:text-6xl font-bold text-gray-900 mb-6">
             Who We Are
           </h2>
           
           <div className="max-w-3xl xl:max-w-4xl mx-auto space-y-6">
-            <p className="text-md sm:text-lg xl:text-xl text-justify [text-align-last:center] 2xl:text-xl text-black">
-              MTA Money Exchange, registered as MTA Worldwide Limited, is widely recognized as one of the most trusted and reliable foreign exchange services in United Kingdom(Grays). MTA Money Exchange (MME) offers bank-beating currency exchange rates with 0% commission. 
+            <p className="text-sm sm:text-lg xl:text-xl text-justify [text-align-last:center] 2xl:text-xl text-black">
+              MTA Currency Exchange, registered as MTA Worldwide Limited, is widely recognized as one of the most trusted and reliable foreign exchange services in United Kingdom(Grays). MTA Currency Exchange (MME) offers bank-beating currency exchange rates with 0% commission. 
             </p>
             
-            <p className="text-md sm:text-lg xl:text-xl text-justify [text-align-last:center] text-black">
+            <p className="text-sm sm:text-lg xl:text-xl text-justify [text-align-last:center] text-black">
               Over the years, we have built a strong reputation for honesty, reliability, and exceptional service quality. Every client matters to us, and we take pride in creating lasting, mutually satisfying relationships. At MTA, customer convenience and transparent foreign exchange services are always our top priorities.
             </p>
           </div>
@@ -83,11 +84,11 @@ const AboutUs = () => {
       <section className="bg-yellow-300/20 py-12 md:py-15 mb-20">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-10">
           <div className="text-center text-gray-900">
-            <h2 className="text-2xl sm:text-3xl 2xl:text-4xl font-bold mb-1">
+            <h2 className="text-xl sm:text-3xl 2xl:text-4xl font-bold mb-1">
               Our Most Prominent Services
             </h2>
-            <p className="text-md sm:text-lg xl:text-xl w-full sm:max-w-3xl mx-auto mb-8 sm:mb-12">
-              MTA Money Exchange offers several services  
+            <p className="text-sm sm:text-lg xl:text-xl w-full sm:max-w-3xl mx-auto mb-8 sm:mb-12">
+              MTA Currency Exchange offers several services  
             </p>
           </div>
 
@@ -112,15 +113,20 @@ const AboutUs = () => {
 
                 {/* Content */}
                 <div className="px-1 sm:px-5 py-3 flex flex-col flex-grow">
-                  <h3 className="text-xl md:text-xl font-bold text-gray-900 mb-1">
+                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1">
                     {service.name}
                   </h3>
-                  <p className="text-md text-black mb-4 text-justify leading-tight">
+                  <p className="text-sm sm:text-md text-black mb-4 text-justify leading-tight">
                     {service.description}
                   </p>
-                  <a href={service.url} className="text-center w-full bg-blue-950 cursor-pointer mt-auto text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                  <Link href={service.url} passHref className='mt-auto'>
+                    <div className="text-center w-full bg-blue-950 cursor-pointer mt-auto text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
+                      Know More
+                    </div>
+                  </Link>
+                  {/* <a href={service.url} className="text-center w-full bg-blue-950 cursor-pointer mt-auto text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
                        Know More
-                  </a>
+                  </a> */}
                 </div>
               </div>
             ))}

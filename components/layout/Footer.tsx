@@ -13,7 +13,7 @@ const Footer = () => {
     { name: 'Click & Sell', href: '/click-and-sell-currency' },
     { name: 'Home Delivery', href: '/currency-home-delivery' },
     { name: 'Click & Buy', href: '/click-and-buy-currency' },
-    { name: 'Exchange Rates', href: '/money-exchange/exchange-rates' },
+    { name: 'Exchange Rates', href: '/money-exchange/currency-exchange-rates' },
     { name: 'Contact Us', href: '/contact-us' },
   ];
 
@@ -56,7 +56,7 @@ const Footer = () => {
       {/* Top Section - Page Links */}
       <div className="bg-yellow-300/35 border-t border-b border-yellow-700">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8">
+          <div className="flex flex-wrap justify-center items-center gap-4 md:gap-8">
             {pageLinks.map((link) => (
               <Link
                 key={link.name}
@@ -93,8 +93,8 @@ const Footer = () => {
         <div className="container px-4 py-6">
           <div className="flex flex-col md:flex-row justify-center items-center gap-4">
             {/* Copyright */}
-            <div className="text-sm font-medium text-gray-300">
-              Copyright © 2022 MTA Traders LTD
+            <div className="text-xs sm:text-sm font-medium text-gray-300">
+              Copyright © 2022 MTA Worldwide LTD
             </div>
             
             {/* Bottom Links */}

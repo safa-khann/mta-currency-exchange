@@ -55,7 +55,7 @@ const CurrencyCart: React.FC<CurrencyCartProps> = ({
 
   return (
     <div className={`w-full transition-all duration-300 ${className}`}>
-      <h3 className="text-2xl sm:text-3xl font-bold mb-4">Your Order <span className='text-sm sm:text-lg font-normal'>(Add More Currencies)</span></h3>
+      <h3 className="text-xl sm:text-3xl font-bold mb-4">Your Order <span className='text-sm sm:text-lg font-normal'>(Add More Currencies)</span></h3>
       
       <div className="overflow-x-auto">
         <table className="w-full border-collapse [table-layout:fixed] sm:[table-layout:auto]">

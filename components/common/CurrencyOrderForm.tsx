@@ -42,7 +42,7 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
   const sendOrderMutation = useOrderEmail()
   const titleOptions = ['Mr.', 'Mrs.', 'Ms.'];
   const branchOptions = ['Branch 1 - London', 'Branch 2 - Manchester', 'Branch 3 - Birmingham'];
-  const paymentMethodOptions = ['Pay on branch (card)', 'Pay on branch (cash)'];
+  const paymentMethodOptions = ['Pay on branch (cash)'];
   const [selectedOption, setSelectedOption] = useState<'buy' | 'sell'>(() => {
     // If showOption is 'sell', default to 'sell'
     if (showOption === 'sell') {
@@ -55,7 +55,11 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
     // For 'both' or any other case, default to 'buy'
     return 'buy';
   });
-  const [cartItems, setCartItems] = React.useState<CartItem[]>([]);
+  const [buyCartItems, setBuyCartItems] = useState<CartItem[]>([]);
+  const [sellCartItems, setSellCartItems] = useState<CartItem[]>([]);
+  // Current cart items based on selected option
+  const currentCartItems = selectedOption === 'buy' ? buyCartItems : sellCartItems;
+  // const [cartItems, setCartItems] = React.useState<CartItem[]>([]);
   const [selectedCurrency, setSelectedCurrency] = React.useState(defaultCurrency);
   const [gbpAmount, setGbpAmount] = React.useState('');
   const [foreignAmount, setForeignAmount] = React.useState('');
@@ -86,41 +90,126 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
 
  const [rate, setRate] = React.useState(1.12);
 
-    useEffect(() => {
-    const loadCart = () => {
-      if (typeof window !== 'undefined') {
-        const savedCart = localStorage.getItem('currencyCart');
-        if (savedCart) {
-          try {
-            const parsedCart = JSON.parse(savedCart);
-            setCartItems(parsedCart);
-          } catch (error) {
-            console.error('Error parsing cart from localStorage:', error);
-            localStorage.removeItem('currencyCart');
-          }
+ useEffect(() => {
+  const loadCart = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        // ALWAYS check for buy cart
+        const savedBuyCart = localStorage.getItem('buyCurrencyCart');
+        console.log('Buy cart from localStorage:', savedBuyCart);
+        
+        if (savedBuyCart) {
+          const parsedBuyCart = JSON.parse(savedBuyCart);
+          console.log('Parsed buy cart:', parsedBuyCart);
+          setBuyCartItems(parsedBuyCart);
+        } else {
+          console.log('No buy cart found in localStorage');
+          setBuyCartItems([]); // Ensure it's empty if not found
         }
+        
+        // ALWAYS check for sell cart
+        const savedSellCart = localStorage.getItem('sellCurrencyCart');
+        console.log('Sell cart from localStorage:', savedSellCart);
+        
+        if (savedSellCart) {
+          const parsedSellCart = JSON.parse(savedSellCart);
+          console.log('Parsed sell cart:', parsedSellCart);
+          setSellCartItems(parsedSellCart);
+        } else {
+          console.log('No sell cart found in localStorage');
+          setSellCartItems([]); // Ensure it's empty if not found
+        }
+        
+        // Remove the check for old 'currencyCart' key completely
+        // This is confusing your logic
+        // const savedCart = localStorage.getItem('currencyCart'); // REMOVE THIS
+        
+      } catch (error) {
+        console.error('Error parsing carts from localStorage:', error);
+        // Clear all cart storage on error
+        localStorage.removeItem('buyCurrencyCart');
+        localStorage.removeItem('sellCurrencyCart');
+        // Don't remove old key here - it might still be needed for migration elsewhere
       }
-    };
+    }
+  };
+  
+  // Load immediately on mount
+  console.log('Loading cart on component mount...');
+  loadCart();
+  
+  // Also listen for storage events
+  window.addEventListener('storage', loadCart);
+  return () => window.removeEventListener('storage', loadCart);
+}, []); // Empty dependency array - run only once on mount
+  //   useEffect(() => {
+  //   const loadCart = () => {
+  //     if (typeof window !== 'undefined') {
+  //       // const savedCart = localStorage.getItem('currencyCart');
+  //       // if (savedCart) {
+  //         try {
+  //           // const parsedCart = JSON.parse(savedCart);
+  //           // setCartItems(parsedCart);
+  //           const savedBuyCart = localStorage.getItem('buyCurrencyCart');
+  //         const savedSellCart = localStorage.getItem('sellCurrencyCart');
+          
+  //         if (savedBuyCart) {
+  //           const parsedBuyCart = JSON.parse(savedBuyCart);
+  //           setBuyCartItems(parsedBuyCart);
+  //         }
+          
+  //         if (savedSellCart) {
+  //           const parsedSellCart = JSON.parse(savedSellCart);
+  //           setSellCartItems(parsedSellCart);
+  //         }
+  //         } catch (error) {
+  //           console.error('Error parsing cart from localStorage:', error);
+  //           // localStorage.removeItem('currencyCart');
+  //           localStorage.removeItem('buyCurrencyCart');
+  //           localStorage.removeItem('sellCurrencyCart');
+  //         }
+        
+  //     }
+  //   };
     
-    loadCart();
+  //   loadCart();
     
-    // Also listen for storage events (if cart is updated from another tab/window)
-    window.addEventListener('storage', loadCart);
-    return () => window.removeEventListener('storage', loadCart);
-  }, []);
+  //   // Also listen for storage events (if cart is updated from another tab/window)
+  //   window.addEventListener('storage', loadCart);
+  //   return () => window.removeEventListener('storage', loadCart);
+  // }, []);
   
   // Save cart items to localStorage whenever they change (but not on initial load)
   const isInitialMount = React.useRef(true);
+  // useEffect(() => {
+  //   if (isInitialMount.current) {
+  //     isInitialMount.current = false;
+  //     return;
+  //   }
+    
+  //   if (typeof window !== 'undefined') {
+  //     localStorage.setItem('currencyCart', JSON.stringify(cartItems));
+  //   }
+  // }, [cartItems]);
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
-    
     if (typeof window !== 'undefined') {
-      localStorage.setItem('currencyCart', JSON.stringify(cartItems));
+      localStorage.setItem('buyCurrencyCart', JSON.stringify(buyCartItems));
     }
-  }, [cartItems]);
+  }, [buyCartItems]);
+  
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sellCurrencyCart', JSON.stringify(sellCartItems));
+    }
+  }, [sellCartItems]);
 
   useEffect(() => {
     if (exchangeRates && exchangeRates.length > 0) {
@@ -206,38 +295,67 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
     console.log('Adding item with transactionType:', selectedOption); 
     if (isHomePage) {
     // Get existing cart from localStorage
-    const existingCart = JSON.parse(localStorage.getItem('currencyCart') || '[]');
-    existingCart.push(newItem);
-    localStorage.setItem('currencyCart', JSON.stringify(existingCart));
+    if (selectedOption === 'buy') {
+        const existingBuyCart = JSON.parse(localStorage.getItem('buyCurrencyCart') || '[]');
+        existingBuyCart.push(newItem);
+        localStorage.setItem('buyCurrencyCart', JSON.stringify(existingBuyCart));
+        router.push('/click-and-buy-currency');
+      } else {
+        const existingSellCart = JSON.parse(localStorage.getItem('sellCurrencyCart') || '[]');
+        existingSellCart.push(newItem);
+        localStorage.setItem('sellCurrencyCart', JSON.stringify(existingSellCart));
+        router.push('/click-and-sell-currency');
+      }
+    // const existingCart = JSON.parse(localStorage.getItem('currencyCart') || '[]');
+    // existingCart.push(newItem);
+    // localStorage.setItem('currencyCart', JSON.stringify(existingCart));
     
-    // Redirect
-    router.push(selectedOption === 'buy' ? '/click-and-buy-currency' : '/click-and-sell-currency');
+    // // Redirect
+    // router.push(selectedOption === 'buy' ? '/click-and-buy-currency' : '/click-and-sell-currency');
     return;
   }
-    setCartItems(prev => [...prev, newItem]);
+    // setCartItems(prev => [...prev, newItem]);
+    if (selectedOption === 'buy') {
+      setBuyCartItems(prev => [...prev, newItem]);
+    } else {
+      setSellCartItems(prev => [...prev, newItem]);
+    }
     
     setGbpAmount('');
     setForeignAmount('');
   };
 
   // Remove from cart function
-  const handleRemoveFromCart = (id: string) => {
-    setCartItems(prev => {
-      const updatedCart = prev.filter(item => item.id !== id);
-      // Update localStorage immediately when removing
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('currencyCart', JSON.stringify(updatedCart));
-      }
-      return updatedCart;
-    });
+  const handleRemoveFromCart = (id: string, transactionType?: 'buy' | 'sell') => {
+    const typeToRemove = transactionType || selectedOption;
+    if (typeToRemove === 'buy') {
+      setBuyCartItems(prev => {
+        const updatedCart = prev.filter(item => item.id !== id);
+        return updatedCart;
+      });
+    } else {
+      setSellCartItems(prev => {
+        const updatedCart = prev.filter(item => item.id !== id);
+        return updatedCart;
+      });
+    }
+    // setCartItems(prev => {
+    //   const updatedCart = prev.filter(item => item.id !== id);
+    //   // Update localStorage immediately when removing
+    //   if (typeof window !== 'undefined') {
+    //     localStorage.setItem('currencyCart', JSON.stringify(updatedCart));
+    //   }
+    //   return updatedCart;
+    // });
   };
 
   const filteredCartItems = useMemo(() => {
     if (showOption === 'both') {
-      return cartItems;
+      // return cartItems;
+      return [...buyCartItems, ...sellCartItems];
     }
-    return cartItems.filter(item => item.transactionType === showOption);
-  }, [cartItems, showOption]);
+    return currentCartItems
+  }, [buyCartItems, sellCartItems, currentCartItems, showOption]);
 
   const formattedExchangeRates = useMemo(() => {
     if (!exchangeRates) return [];
@@ -312,6 +430,9 @@ const handleSubmitOrder = async () => {
   setFormErrors({});
   const newErrors: Record<string, string> = {};
   // Validation
+  const allCartItems = showOption === 'both' 
+      ? [...buyCartItems, ...sellCartItems]
+      : currentCartItems;
   if (!termsAccepted) {
     newErrors.terms = 'Please accept the Terms and Conditions';
   }
@@ -333,9 +454,9 @@ const handleSubmitOrder = async () => {
     if (!paymentMethod) newErrors.paymentMethod = 'Please select a payment method';
   }
 
-  if (cartItems.length === 0) {
-    newErrors.cart = 'Your cart is empty. Please add items first.';
-  }
+  if (allCartItems.length === 0) {
+      newErrors.cart = 'Your cart is empty. Please add items first.';
+    }
 
   // If there are errors, set them and stop submission
   if (Object.keys(newErrors).length > 0) {
@@ -351,18 +472,22 @@ const handleSubmitOrder = async () => {
     return;
   }
   // Use the first cart item (or loop through all if multiple)
-  const cartItem = cartItems[0]
+  // const cartItem = cartItems[0]
   
   // Find currency data
-  const selectedCurrencyData = exchangeRates?.find(
-    r => r.currency_code === cartItem.toCurrency.code
-  )
+  // const selectedCurrencyData = exchangeRates?.find(
+  //   r => r.currency_code === cartItem.toCurrency.code
+  // )
 
-  if (!selectedCurrencyData) {
-    alert('Currency data not found')
-    return
-  }
-  const orderItems = cartItems.map(cartItem => {
+  // if (!selectedCurrencyData) {
+  //   alert('Currency data not found')
+  //   return
+  // }
+  // const orderItems = cartItems.map(cartItem => {
+  //     const selectedCurrencyData = exchangeRates?.find(
+  //       r => r.currency_code === cartItem.toCurrency.code
+  //     );
+  const orderItems = allCartItems.map(cartItem => {
       const selectedCurrencyData = exchangeRates?.find(
         r => r.currency_code === cartItem.toCurrency.code
       );
@@ -394,8 +519,17 @@ const handleSubmitOrder = async () => {
     const result = await sendOrderMutation.mutateAsync(orderData)
     
     if (result.success) {
-      localStorage.removeItem('currencyCart')
-      setCartItems([])
+      // localStorage.removeItem('currencyCart')
+      if (selectedOption === 'buy') {
+          // Clear only buy cart
+          localStorage.removeItem('buyCurrencyCart');
+          setBuyCartItems([]);
+        } else {
+          // Clear only sell cart
+          localStorage.removeItem('sellCurrencyCart');
+          setSellCartItems([]);
+        }
+      // setCartItems([])
       // Reset form
       setGbpAmount('')
       setForeignAmount('')
@@ -527,8 +661,8 @@ const handleSubmitOrder = async () => {
        {/* Cart Component */}
       <div className="relative z-10 pt-30 sm:pt-30 md:pt-28 lg:pt-25">
     {/* Cart Section */}
-     {showCart && cartItems.length > 0 && (
-      <div className="pt-15 sm:pt-0 mb-8 px-3 sm:px-10 ">
+     {showCart && currentCartItems.length > 0 && (
+      <div className="pt-15 sm:pt-0 mb-5 px-3 sm:px-10 ">
         <CurrencyCart 
           items={filteredCartItems}
           onRemoveItem={handleRemoveFromCart}
@@ -539,7 +673,7 @@ const handleSubmitOrder = async () => {
       
         {/* Personal Details Section - Hidden if prop is false */}
         {showPersonalDetails && (    
-          <div className="pt-15 sm:pt-5 px-3 sm:px-10">
+          <div className="pt-5 sm:pt-5 px-3 sm:px-10">
             <h3 className="text-xl sm:text-3xl font-bold mb-3">Your Personal Details</h3>
              {isOrderSuccess && (
              <div 
@@ -606,7 +740,7 @@ const handleSubmitOrder = async () => {
             </div>
 
             {/* Email and Mobile */}
-            <div className="flex gap-1 sm:gap-3 mb-4 sm:mb-2">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-3 mb-4 sm:mb-2">
               <div className='w-full sm:w-97'>
               <input
                 type="email"
@@ -724,7 +858,7 @@ const handleSubmitOrder = async () => {
                 'Confirm Order'
               )}
             </button>
-            {formErrors.cart && cartItems.length === 0 && (
+            {formErrors.cart && currentCartItems.length === 0 && (
                 <p className="pt-3 text-red-500 text-xs mt-1">{formErrors.cart}</p>
               )}
           </div>

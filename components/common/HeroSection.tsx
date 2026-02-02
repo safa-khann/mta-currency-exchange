@@ -15,7 +15,7 @@ export default function HeroSection({
   children 
 }: HeroSectionProps) {
   return (
-    <div className="px-5 relative bg-black w-full h-[60vh] md:h-[85vh]">
+    <div className="px-5 relative bg-black w-full h-[55vh] md:h-[85vh]">
       {/* Background Image */}
       <div className="absolute max-w-[85%] mx-auto inset-0">
         <Image

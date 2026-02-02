@@ -1,78 +1,6 @@
 // app/api/send-order/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
-
-// export async function POST(request: NextRequest) {
-//   try {
-//     const orderData = await request.json()
-
-//     // Validation
-//     const requiredFields = [
-//       'customer_title', 'first_name', 'last_name', 'email', 'mobile',
-//       'branch_name', 'currency_name', 'currency_code', 'country_name',
-//       'transaction_type', 'gbp_amount', 'foreign_amount', 'exchange_rate'
-//     ]
-    
-//     const missingFields = requiredFields.filter(field => !orderData[field])
-    
-//     if (missingFields.length > 0) {
-//       return NextResponse.json(
-//         { 
-//           success: false, 
-//           error: `Missing required fields: ${missingFields.join(', ')}` 
-//         },
-//         { status: 400 }
-//       )
-//     }
-
-//     // Setup Nodemailer transporter
-//     const transporter = nodemailer.createTransport({
-//       host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-//       port: parseInt(process.env.EMAIL_PORT || '587'),
-//       secure: process.env.EMAIL_PORT === '465', // true for 465, false for other ports
-//       auth: {
-//         user: process.env.EMAIL_USER,
-//         pass: process.env.EMAIL_PASSWORD,
-//       },
-//     })
-
-//     // Customer email
-//     const customerHtml = generateCustomerEmailHTML(orderData)
-    
-//     await transporter.sendMail({
-//       from: `"MTA Currency Exchange" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
-//       to: orderData.email,
-//       subject: `✅ Order Confirmation - ${orderData.currency_code} ${orderData.transaction_type === 'buy' ? 'Purchase' : 'Sell'}`,
-//       html: customerHtml,
-//     })
-
-//     // Admin email (optional)
-//     const adminHtml = generateAdminEmailHTML(orderData)
-    
-//     await transporter.sendMail({
-//       from: `"MTA Currency Exchange" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
-//       to: process.env.EMAIL_FROM || 'mtaworldwidelimited@gmail.com',
-//       subject: `📋 New Order: ${orderData.first_name} ${orderData.last_name} - ${orderData.currency_code}`,
-//       html: adminHtml,
-//     })
-
-//     return NextResponse.json({
-//       success: true,
-//       message: 'Order confirmation sent successfully'
-//     })
-
-//   } catch (error: any) {
-//     console.error('Email sending error:', error)
-//     return NextResponse.json(
-//       { 
-//         success: false, 
-//         error: 'Failed to send order confirmation. Please try again.' 
-//       },
-//       { status: 500 }
-//     )
-//   }
-// }
-// app/api/send-order/route.ts
 export async function POST(request: NextRequest) {
   try {
     const orderData = await request.json()
@@ -147,6 +75,11 @@ export async function POST(request: NextRequest) {
       to: orderData.email,
       subject: `✅ Order Confirmation - ${orderNumber}`,
       html: customerHtml,
+      attachments: [{
+      filename: 'logo-wid.png',
+      path: './public/images/logo-wid.png', // Path to your logo
+      cid: 'mtalogo' // Same cid value as in the HTML img src
+    }]
     });
 
     // Admin email with items array
@@ -157,6 +90,11 @@ export async function POST(request: NextRequest) {
       to: process.env.EMAIL_FROM || 'mtaworldwidelimited@gmail.com',
       subject: `📋 New Order ${orderNumber}: ${orderData.first_name} ${orderData.last_name} - ${orderData.items.length} item(s)`,
       html: adminHtml,
+      attachments: [{
+      filename: 'logo-wid.png',
+      path: './public/images/logo-wid.png', // Path to your logo
+      cid: 'mtalogo' // Same cid value as in the HTML img src
+    }]
     });
 
     return NextResponse.json({
@@ -188,12 +126,38 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
       <td style="padding: 12px 8px; text-align: center;">${index + 1}</td>
       <td style="padding: 12px 8px;">
         ${item.transaction_type === 'buy' ? 'Buy' : 'Sell'} ${item.currency_code}
+        <p style="font-size:10px; color:black;">${item.currency_name}</p>
       </td>
-      <td style="padding: 12px 8px; text-align: left;">£${parseFloat(item.gbp_amount).toFixed(2)}</td>
-      <td style="padding: 12px 8px; text-align: left;">${parseFloat(item.foreign_amount).toFixed(2)} ${item.currency_code}</td>
+      <td style="padding: 12px 8px; text-align: left;">£${parseFloat(item.gbp_amount).toFixed(2)} </td>
+      <td style="padding: 12px 8px; text-align: left;">$${parseFloat(item.foreign_amount).toFixed(2)}</td>
       <td style="padding: 12px 8px; text-align: left;">${parseFloat(item.exchange_rate).toFixed(4)}</td>
     </tr>
   `).join('');
+  const hasBuyItems = orderData.items.some((item: any) => item.transaction_type === 'buy');
+   let tableHeaders = '';
+   if (hasBuyItems) {
+    // If only buy transactions
+    tableHeaders = `
+      <tr>
+        <th>#</th>
+        <th>Transaction</th>
+        <th>You Pay (GBP)</th>
+        <th>You Receive (Foreign)</th>
+        <th>Exchange Rate</th>
+      </tr>
+    `;
+  } else {
+    // If only sell transactions
+    tableHeaders = `
+      <tr>
+        <th>#</th>
+        <th>Transaction</th>
+        <th>You Receive (GBP)</th>
+        <th>You Pay (Foreign)</th>
+        <th>Exchange Rate</th>
+      </tr>
+    `;
+  }
 
   return `
    <!DOCTYPE html>
@@ -236,17 +200,20 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
         .logo-container {
             font-family: Arial, sans-serif;
             text-align: center;
+            margin-bottom: 15px;
+            display: inline-block;
         }
         
         .logo-text {
             margin-left: 12px;
             margin-bottom:10px;
             gap: 0;
+            display:inline-block;
         }
         
         .logo-mta {
             font-weight: bold;
-            font-size: 24px;
+            font-size: 20px;
             line-height: 1;
             color: #f59e0b;
             white-space: nowrap;
@@ -254,26 +221,26 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
         
         .logo-currency, .logo-exchange {
             font-weight: 600;
-            font-size: 10px;
+            font-size: 9px;
             line-height: 1.2;
             color: #f59e0b;
             white-space: nowrap;
         }
         
         .email-body {
-            padding: 30px;
+            padding: 30px 20px;
         }
         
         .greeting {
-            font-size: 16px;
+            font-size: 14px;
             margin-bottom: 25px;
-            color: #555555;
+            color: #050505;
         }
         
         .message {
-            font-size: 15px;
+            font-size: 14px;
             margin-bottom: 30px;
-            color: #555555;
+            color: #000000;
         }
         
         .section {
@@ -302,12 +269,12 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
         
         .detail-label {
             font-weight: bold;
-            color: #444444;
+            color: #0c0c0c;
             min-width: 115px;
         }
         
         .detail-value {
-            color: #555555;
+            color: #282828;
             flex: 1;
         }
         
@@ -344,7 +311,7 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
             color: #ffffff;
             padding: 25px 30px;
             text-align: center;
-            font-size: 13px;
+            font-size: 12px;
         }
         
         .footer-links {
@@ -378,15 +345,16 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
         
         .items-table th {
             background-color: #f8f9fa;
-            padding: 12px 8px;
+            padding: 12px 5px;
             text-align: left;
             border-bottom: 2px solid #dee2e6;
-            color: #495057;
-            font-weight: 600;
+            color: #000000;
+            font-weight: medium;
+            font-size: 12px;
         }
         
         .items-table td {
-            padding: 12px 8px;
+            padding: 12px 5px;
             text-align: left;
             border-bottom: 1px solid #eaeaea;
         }
@@ -399,7 +367,7 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
         
         @media (max-width: 600px) {
             .email-body {
-                padding: 20px;
+                padding: 25px 10px;
             }
             
             .detail-row {
@@ -407,8 +375,11 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
             }
             
             .detail-label {
-                width: 100%;
+                min-width:100px;
                 margin-bottom: 5px;
+            }
+            .items-table th {
+             font-size:11px;
             }
             
             .footer-links {
@@ -421,7 +392,7 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
             }
             
             .items-table {
-                font-size: 12px;
+                font-size: 11px;
             }
         }
     </style>
@@ -431,13 +402,19 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
         <!-- Email Header with Logo -->
         <div class="email-header">
             <div class="logo-container">
+              <img src="cid:mtalogo" 
+                alt="MTA Logo" 
+                style="max-height: 40px; width: auto; display:inline-block;"
+                width="120"
+                height="auto">
                 <div class="logo-text">
                     <p class="logo-mta">MTA</p>
                     <p class="logo-currency">CURRENCY</p>
                     <p class="logo-exchange">EXCHANGE</p>
                 </div>
-                <h2 style="color:white;">Order Confirmed!</h2>
             </div>
+            <h2 style="color:white;">Order Confirmed!</h2>
+             <h2 style="color:white; font-size:x-large; font-weight:100;">#${orderNumber}</h2>
         </div>
         
         <!-- Email Body -->
@@ -447,17 +424,11 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
             <p class="message">Thank you for your order with MTA Currency Exchange. Your transaction has been confirmed and is now being processed.</p>
             
             <div class="section">
-                <h2 class="section-title">Order Summary</h2>
+                <h3 class="section-title">Order Summary</h3>
                 
                 <table class="items-table">
                     <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Transaction</th>
-                            <th>GBP Amount</th>
-                            <th>Foreign Amount</th>
-                            <th>Exchange Rate</th>
-                        </tr>
+                       ${tableHeaders}
                     </thead>
                     <tbody>
                         ${itemsHtml}
@@ -481,7 +452,7 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
             </div>
             
             <div class="section">
-                <h2 class="section-title">Customer Information</h2>
+                <h3 class="section-title">Customer Information</h3>
                 
                 <div class="detail-row">
                     <span class="detail-label">Name:</span>
@@ -499,11 +470,11 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Payment Method:</span>
-                    <span class="detail-value">${orderData.payment_method}</span>
+                    <span class="detail-value style="padding-left:3px;">${orderData.payment_method}</span>
                 </div>
                 ${orderData.notes ? `
                 <div class="detail-row">
-                    <span class="detail-label">Order Note:</span>
+                <span class="detail-label">Order Note:</span>
                     <span class="detail-value">${orderData.notes}</span>
                 </div>
                 ` : ''}
@@ -517,7 +488,7 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
             
             <p>Your order number is:</p>
             <div class="order-number">${orderNumber}</div>
-            <p style="margin-top: 15px; font-size: 14px;">Please quote this reference number when visiting the branch.</p>
+            <p style="margin-top: 15px; font-size: 14px; margin-bottom: 10px;">Please quote this reference number when visiting the branch.</p>
         </div>
         
         <!-- Email Footer -->
@@ -529,7 +500,7 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string): string 
             <a href="https://www.mtaworldwidelimited.com" class="footer-link">www.mtaworldwidelimited.com</a>
             <div class="copyright">
                 <p>© 2025 MTA World Wide Limited. All rights reserved.</p>
-                <p>This email was sent to <span style="color:#5e8eff !important;">${orderData.email}</span> in response to your currency exchange order.</p>
+                <p style="font-size:10px;">This email was sent to <span style="color:#c0c0c0;">${orderData.email}</span> in response to your currency exchange order.</p>
             </div>
         </div>
     </div>
@@ -542,19 +513,45 @@ function generateAdminEmailHTML(orderData: any, orderNumber: string): string {
   // Calculate totals
   const totalGBP = orderData.items.reduce((sum: number, item: any) => 
     sum + (item.gbp_amount || 0), 0);
-  
+ 
   // Generate items table for admin
   const itemsHtml = orderData.items.map((item: any, index: number) => `
     <tr style="border-bottom: 1px solid #eaeaea;">
-      <td style="padding: 10px; text-align: center;">${index + 1}</td>
-      <td style="padding: 10px;">${item.currency_name || item.currency_code}</td>
-      <td style="padding: 10px;">${item.currency_code}</td>
-      <td style="padding: 10px;">${item.transaction_type === 'buy' ? 'BUY' : 'SELL'}</td>
-      <td style="padding: 10px;">£${parseFloat(item.gbp_amount).toFixed(2)}</td>
-      <td style="padding: 10px;">${parseFloat(item.foreign_amount).toFixed(2)}</td>
-      <td style="padding: 10px;">${parseFloat(item.exchange_rate).toFixed(4)}</td>
+      <td style="padding: 12px 8px; text-align: left;">${index + 1}</td>
+      <td style="padding: 12px 8px;">
+        ${item.transaction_type === 'buy' ? 'Buy' : 'Sell'} ${item.currency_code}
+        <p style="font-size:10px; color:black;">${item.currency_name}</p>
+      </td>
+      <td style="padding: 12px 8px; text-align: left;">£${parseFloat(item.gbp_amount).toFixed(2)} </td>
+      <td style="padding: 12px 8px; text-align: left;">$${parseFloat(item.foreign_amount).toFixed(2)}</td>
+      <td style="padding: 12px 8px; text-align: left;">${parseFloat(item.exchange_rate).toFixed(4)}</td>
     </tr>
   `).join('');
+  const hasBuyItems = orderData.items.some((item: any) => item.transaction_type === 'buy');
+   let tableHeaders = '';
+   if (hasBuyItems) {
+    // If only buy transactions
+    tableHeaders = `
+      <tr>
+        <th>#</th>
+        <th>Transaction</th>
+        <th>You Recieve (GBP)</th>
+        <th>You Send (Foreign)</th>
+        <th>Exchange Rate</th>
+      </tr>
+    `;
+  } else {
+    // If only sell transactions
+    tableHeaders = `
+      <tr>
+        <th>#</th>
+        <th>Transaction</th>
+        <th>You Send (GBP)</th>
+        <th>You Recieve (Foreign)</th>
+        <th>Exchange Rate</th>
+      </tr>
+    `;
+  }
 
   return `
     <!DOCTYPE html>
@@ -621,8 +618,7 @@ function generateAdminEmailHTML(orderData: any, orderNumber: string): string {
           padding-bottom: 8px;
           border-bottom: 2px solid #f59e0b;
         }
-        
-        .details-table {
+         .details-table {
           width: 100%;
           border-collapse: collapse;
           margin: 20px 0;
@@ -631,34 +627,36 @@ function generateAdminEmailHTML(orderData: any, orderNumber: string): string {
         
         .details-table th {
           background-color: #f8f9fa;
-          padding: 12px 10px;
+          padding: 12px 8px;
           text-align: left;
           border-bottom: 2px solid #dee2e6;
-          color: #495057;
-          font-weight: 600;
+          color: #141414;
+          font-weight: medium;
+          font-size: 12px;
         }
         
         .details-table td {
-          padding: 12px 10px;
+          padding: 12px 8px;
+          text-align: left;
           border-bottom: 1px solid #eaeaea;
         }
         
         .total-row {
           font-weight: bold;
-          background-color: #e9ecef;
+          background-color: #eef0f2;
           border-top: 2px solid #dee2e6;
         }
-        
         .customer-info {
-          background-color: #f8f9fa;
-          padding: 20px;
+          padding: 30px 0px;
           border-radius: 4px;
           margin: 25px 0;
         }
         
-        .customer-info h4 {
+        .customer-info h3 {
           color: #0638a7;
           margin-bottom: 15px;
+          padding-bottom: 8px;
+          border-bottom: 2px solid #f59e0b;
         }
         
         .info-row {
@@ -667,8 +665,8 @@ function generateAdminEmailHTML(orderData: any, orderNumber: string): string {
         
         .info-label {
           font-weight: bold;
-          color: #495057;
-          min-width: 150px;
+          color: #3b3c3d;
+          min-width: 100px;
           display: inline-block;
         }
         
@@ -679,13 +677,31 @@ function generateAdminEmailHTML(orderData: any, orderNumber: string): string {
           color: #6c757d;
           font-size: 12px;
         }
+        @media (max-width: 600px) {
+          .content {
+            padding: 20px 10px;
+          }
+           .details-table {
+              font-size: 12px;
+            }
+            .details-table th{
+            font-size: 11px;
+            }
+          .header {
+          padding: 20px;}
+          }
       </style>
     </head>
     <body>
       <div class="container">
         <div class="header">
-          <h2>📋 NEW ORDER RECEIVED</h2>
-          <p>Order Number: ${orderNumber}</p>
+        <img src="cid:mtalogo" 
+                alt="MTA Logo" 
+                style="max-height: 30px; width: auto;"
+                width="120"
+                height="auto">
+          <h2>NEW ORDER RECEIVED</h2>
+          <p>Order Number: <strong>${orderNumber}</strong></p>
           <p>${orderData.items.length} Item(s) | <strong>Total: </strong> £${totalGBP.toFixed(2)} GBP</p>
         </div>
         
@@ -694,29 +710,21 @@ function generateAdminEmailHTML(orderData: any, orderNumber: string): string {
             <h3>Order Details</h3>
             <table class="details-table">
               <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Currency Name</th>
-                  <th>Code</th>
-                  <th>Type</th>
-                  <th>GBP Amount</th>
-                  <th>Foreign Amount</th>
-                  <th>Rate</th>
-                </tr>
+                ${tableHeaders}
               </thead>
               <tbody>
                 ${itemsHtml}
                 <tr class="total-row">
-                  <td colspan="4" style="text-align: right;">TOTAL GBP:</td>
+                  <td colspan="2" style="text-align: right;">TOTAL GBP:</td>
                   <td">£${totalGBP.toFixed(2)}</td>
-                  <td colspan="2"></td>
+                  <td colspan="3"></td>
                 </tr>
               </tbody>
             </table>
           </div>
           
           <div class="customer-info">
-            <h4>Customer Information</h4>
+            <h3>Customer Information</h3>
             <div class="info-row">
               <span class="info-label">Customer:</span>
               ${orderData.customer_title} ${orderData.first_name} ${orderData.last_name}
@@ -734,13 +742,12 @@ function generateAdminEmailHTML(orderData: any, orderNumber: string): string {
               ${orderData.branch_name}
             </div>
             <div class="info-row">
-              <span class="info-label">Payment Method:</span>
+              <span class="info-label" style="padding-right:3px;">Payment Method:</span>
               ${orderData.payment_method}
             </div>
             ${orderData.notes ? `
             <div class="info-row">
-              <span class="info-label">Customer Notes:</span>
-              ${orderData.notes}
+            <span class="info-label" style="padding-right:3px;">Customer Notes: </span>${orderData.notes}
             </div>
             ` : ''}
           </div>
