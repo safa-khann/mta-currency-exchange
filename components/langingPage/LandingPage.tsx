@@ -2,6 +2,8 @@
 import Image from "next/image";
 import CurrencyOrderForm from "../common/CurrencyOrderForm";
 import { useCurrencyRates } from "@/lib/hooks/useCurrency";
+import MoneyTransferComp from "../common/MoneyTransferComp";
+import GoogleReviews from "../common/GoogleReviews";
 
 export default function LandingPage() {
     const { data: exchangeRates, isLoading } = useCurrencyRates();
@@ -10,7 +12,7 @@ export default function LandingPage() {
     const filteredRates = exchangeRates?.filter(rate => 
         displayCurrencies.includes(rate.currency_code)
     ) || [];
-  return (
+ return (
     <>
      <CurrencyOrderForm
       heading="Currency Converter"
@@ -162,60 +164,10 @@ export default function LandingPage() {
             max-w-2xl text-black">"Experience the difference with MTA Currency Exchange. Unlike traditional high street shops and banks, we offer a tailored approach to currency exchange. With a dedicated account executive by your side, you'll enjoy a personalized service that prioritizes your needs and secures the best rates."
             </p>
            </div>
-        {/* Authorised */}
-        <div id="money-transfer" className=" w-full px-4 pt-9 sm:pt-14 sm:px-8 lg:px-18 pb-10">
-            <h2 className="text-xl sm:text-3xl font-bold text-black mb-5 sm:mb-7">Authorised By</h2>
-           
-            <div className="max-w-2xl mx-auto flex flex-wrap sm:flex-row gap-0  justify-between items-center">
-                <Image
-                    src="/images/fca.png"
-                alt="Hero background"
-                width={180}
-                height={40}
-                className="w-40 sm:w-60"
-                priority
-                />
-                <Image
-                    src="/images/hmm.png"
-                alt="Hero background"
-                width={180}
-                height={40}
-                className="w-40 sm:w-60"
-                priority
-                />
-           
-            </div>
-        </div>
-        {/* Global partners */}
-         <div className=" w-full px-4 pt-3 sm:pt-0 md:pt-8 sm:px-8 lg:px-18 pb-0">
-            <h2 className="text-start text-xl sm:text-3xl font-bold text-black mb-5 sm:mb-8">Global Partners</h2>
-            <div className="max-w-2xl mx-auto flex flex-wrap sm:flex-row gap-0 justify-between items-center">
-                <Image
-                    src="/images/moneygram logo.png"
-                alt="Hero background"
-                width={180}
-                height={40}
-                className="w-40 sm:w-60"
-                priority
-                />
-                <Image
-                    src="/images/western union.png"
-                alt="Hero background"
-                width={180}
-                height={40}
-                className="w-40 sm:w-60"
-                priority
-                />
-                <Image
-                src="/images/riya-money-transfer.png"
-                alt="Hero background"
-                width={200}
-                height={200}
-                className="mx-auto w-40 sm:w-60"
-                priority
-                />
-            </div>
-        </div>
+           <MoneyTransferComp showAuth={true} showGlobalPartners={true} />
+           <GoogleReviews placeId="ChIJ29tg6ZK32EcRqVpTwhZEmRk"/>
+          
+         
     </>
   );
 }

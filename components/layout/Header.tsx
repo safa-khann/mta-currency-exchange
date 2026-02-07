@@ -4,7 +4,8 @@ import Image from 'next/image';
 import {  
   AlignJustify, 
   X, 
-  ChevronRight, 
+  ChevronRight,
+  ChevronDown, 
 } from 'lucide-react';
 import SocialLinks from '../common/SocialLinks';
 import Link from 'next/link';
@@ -95,17 +96,10 @@ export default function Header() {
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className="px-6 py-2.5 rounded-lg cursor-pointer font-medium transition-all duration-200 bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
                   >
-                    Money Exchange
-                    <svg
-                      className={`inline-block ml-2 w-4 h-4 transition-transform duration-200 ${
+                    Money Exchange <ChevronDown className={`text-white/90 inline-block ml-2 w-5 h-5 transition-transform duration-200 ${
                         isDropdownOpen ? 'rotate-180' : ''
-                      }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                      }`} />
+                    
                   </button>
 
                   {/* Dropdown Menu */}
@@ -150,6 +144,11 @@ export default function Header() {
                 </div>
 
                 {/* Money Transfer Button */}
+                <a className="px-6 py-2.5 rounded-lg cursor-pointer font-medium transition-all duration-200 bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
+                  href="/money-transfer"
+                >
+                  Money Transfer
+                </a>
                 <a className="px-6 py-2.5 rounded-lg cursor-pointer font-medium transition-all duration-200 bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
                   href="/about-mta"
                 >
@@ -257,6 +256,9 @@ export default function Header() {
             </div>
 
             {/* Additional Links */}
+            <a href="/money-transfer" className="block font-bold text-gray-900 mb-4 text-lg border-b border-yellow-400 pb-1">
+                Money Transfer
+              </a>
               <a href="/about-mta" className="block font-bold text-gray-900 mb-4 text-lg border-b border-yellow-400 pb-1">
                 About Us
               </a>

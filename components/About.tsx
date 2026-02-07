@@ -38,7 +38,7 @@ const AboutUs = () => {
     {
       id: 4,
       name: 'Money Transfer',
-      url: '/#money-transfer',
+      url: '/money-transfer',
       description: 'Begin your international money transfer  online, on the app or pay in person, to receivers around the world. It’s Quick, Safe, Fast, and Easier.',
       imageUrl: '/images/Transfer money internationlly today at MTA.jpg',
     },
@@ -70,7 +70,7 @@ const AboutUs = () => {
           
           <div className="max-w-3xl xl:max-w-4xl mx-auto space-y-6">
             <p className="text-sm sm:text-lg xl:text-xl text-justify [text-align-last:center] 2xl:text-xl text-black">
-              MTA Currency Exchange, registered as MTA Worldwide Limited, is widely recognized as one of the most trusted and reliable foreign exchange services in United Kingdom(Grays). MTA Currency Exchange (MME) offers bank-beating currency exchange rates with 0% commission. 
+              MTA Currency Exchange, registered as <a href='https://find-and-update.company-information.service.gov.uk/company/13941385' target='_blank'>MTA Worldwide Limited</a>, is widely recognized as one of the most trusted and reliable foreign exchange services in United Kingdom(Grays). MTA Currency Exchange (MME) offers bank-beating currency exchange rates with 0% commission. 
             </p>
             
             <p className="text-sm sm:text-lg xl:text-xl text-justify [text-align-last:center] text-black">

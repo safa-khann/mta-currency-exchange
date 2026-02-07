@@ -673,7 +673,7 @@ const handleSubmitOrder = async () => {
       
         {/* Personal Details Section - Hidden if prop is false */}
         {showPersonalDetails && (    
-          <div className="pt-5 sm:pt-5 px-3 sm:px-10">
+          <div className="pt-10 sm:pt-5 px-3 sm:px-10">
             <h3 className="text-xl sm:text-3xl font-bold mb-3">Your Personal Details</h3>
              {isOrderSuccess && (
              <div 
