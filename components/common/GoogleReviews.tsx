@@ -187,15 +187,15 @@ export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
           )}
 
           <h2 className='mb-0 text-xl mb-2 sm:text-3xl font-bold'>Reviews</h2>
-          
-          <div className="mb-10 flex items-center gap-0 text-xl font-bold">
+          <div className='grid grid-cols-1 md:grid-cols-2 mb-10'>
+            <div className=" flex items-center gap-0 text-xl font-bold">
             <span style={{ color: '#4285F4' }}>G</span>
             <span style={{ color: '#EA4335' }}>o</span>
             <span style={{ color: '#FBBC04' }}>o</span>
             <span style={{ color: '#4285F4' }}>g</span>
             <span style={{ color: '#34A853' }}>l</span>
             <span style={{ color: '#EA4335' }}>e</span>
-            <span className='font-light text-xl ml-3 px-2'>{rating.toFixed(1)}</span>
+            <span className='font-light text-xl ml-1 px-2'>{rating.toFixed(1)}</span>
             <div className="flex items-end">
               {[...Array(5)].map((_, i) => (
                 <span
@@ -205,8 +205,16 @@ export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
                   ★
                 </span>
               ))}
+              <span className='font-light text-xl px-2'>Rating</span>
             </div>
-            <span className='font-light text-xl px-2'>Rating</span>
+
+          </div>
+          <a href="https://www.google.com/maps/place/MTA+worldwide+Currency+Exchange+%26+Money+Transfer/@51.4769918,0.3226627,17z/data=!4m8!3m7!1s0x47d8b792e960dbdb:0x19994416c2535aa9!8m2!3d51.4769918!4d0.3226627!9m1!1b1!16s%2Fg%2F11m5fjwvxt?entry=ttu&g_ep=EgoyMDI2MDIwNC4wIKXMDSoASAFQAw%3D%3D" 
+          className="text-sm w-50 text-center mt-3 ms-0 md:ms-auto bg-blue-950 cursor-pointer my-auto text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+          target='_blank'>
+              Give a Review
+          </a>
+            
           </div>
 
           {/* Reviews Scroll Container */}
