@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     await transporter.sendMail({
       from: `"MTA Currency Exchange" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_FROM || 'mtaworldwidelimited@gmail.com',
-      subject: `📋 New Order ${orderNumber}: ${orderData.first_name} ${orderData.last_name} - ${orderData.items.length} item(s)`,
+      subject: `📋 New Order MTA - ${orderNumber}: ${orderData.first_name} ${orderData.last_name} - ${orderData.items.length} item(s)`,
       html: adminHtml
     //   attachments: [{
     //   filename: 'logo-wid.png',
@@ -470,7 +470,7 @@ function generateCustomerEmailHTML(orderData: any, orderNumber: string, domain: 
                 </div>
                 <div class="detail-row">
                     <span class="detail-label">Payment Method:</span>
-                    <span class="detail-value style="padding-left:3px;">${orderData.payment_method}</span>
+                    <span class="detail-value style="padding-left: 3px;">${orderData.payment_method}</span>
                 </div>
                 ${orderData.notes ? `
                 <div class="detail-row">

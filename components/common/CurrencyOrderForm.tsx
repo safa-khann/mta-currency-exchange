@@ -41,7 +41,7 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
 
   const sendOrderMutation = useOrderEmail()
   const titleOptions = ['Mr.', 'Mrs.', 'Ms.'];
-  const branchOptions = ['Branch 1 - London', 'Branch 2 - Manchester', 'Branch 3 - Birmingham'];
+  const branchOptions = ['Grays Branch 54-56 High Street RM16 6NA'];
   const paymentMethodOptions = ['Pay on branch (cash)'];
   const [selectedOption, setSelectedOption] = useState<'buy' | 'sell'>(() => {
     // If showOption is 'sell', default to 'sell'
