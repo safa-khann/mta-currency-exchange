@@ -57,7 +57,7 @@ export default function HeroSection({
         >
           <path
             d="M0 80C240 40 480 40 720 40C960 40 1200 40 1440 80V80H0Z"
-            fill="white"
+            className='fill-white dark:fill-black'
           />
         </svg>
       </div>

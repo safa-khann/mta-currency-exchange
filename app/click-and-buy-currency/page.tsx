@@ -10,7 +10,7 @@ export const metadata : Metadata = {
     description: 'Purchase foreign currency online with best rates & 0% commission',
   },
   alternates: {
-    canonical: 'https://mta-worldwide.co.uk/click-and-buy-currency',
+    canonical: 'https://mtaworldwide.co.uk/click-and-buy-currency',
   },
     robots: {
     index: true,

@@ -53,7 +53,7 @@ export const useOrderEmail = () => {
   return useMutation<SendOrderResponse, Error, any>({
     mutationFn: sendOrderEmail,
     onSuccess: (data) => {
-      console.log('Order email sent:', data.message)
+      // console.log('Order email sent:', data.message)
     },
     onError: (error) => {
       console.error('Failed to send order email:', error)

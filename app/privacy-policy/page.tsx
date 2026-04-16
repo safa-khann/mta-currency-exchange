@@ -10,7 +10,7 @@ export const metadata : Metadata = {
     description: 'Learn how MTA Worldwide protects your personal data',
   },
   alternates: {
-    canonical: 'https://mta-worldwide.co.uk/privacy-policy',
+    canonical: 'https://mtaworldwide.co.uk/privacy-policy',
   },
   robots: {
     index: true,

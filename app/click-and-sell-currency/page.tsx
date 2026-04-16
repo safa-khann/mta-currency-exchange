@@ -10,7 +10,7 @@ export const metadata : Metadata = {
     description: 'Get best rates when selling currency online with 0% commission',
   },
   alternates: {
-    canonical: 'https://mta-worldwide.co.uk/click-and-sell-currency',
+    canonical: 'https://mtaworldwide.co.uk/click-and-sell-currency',
   },
     robots: {
     index: true,

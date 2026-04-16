@@ -10,7 +10,7 @@ export const metadata : Metadata = {
     description: 'Get reasonable exchange rates with 0% commission',
   },
   alternates: {
-    canonical: 'https://mta-worldwide.co.uk/money-exchange/currency-exchange-rates',
+    canonical: 'https://mtaworldwide.co.uk/money-exchange/currency-exchange-rates',
   },
     robots: {
     index: true,

@@ -22,7 +22,7 @@ export default function LandingPage() {
       showCart={false}
       isHomePage={true}
     />
-    <div className="mt-15 sm:mt-18 md:mt-15 lg:mt-4 px-2 lg:px-25 flex items-center justify-center ">
+    <div className="mt-15 sm:mt-18 md:mt-15 lg:mt-4 px-2 lg:px-25 flex items-center justify-center">
         <div className="grid grid-cols-1 md:grid-cols-3 md:gap-5 gap-10 mx-4 max-mx-auto">
             <div className="bg-white relative rounded-3xl flex flex-col shadow-equal-md p-6 relative pt-12 pb-10 border border-gray-100">
                 <div className="absolute top-[-20px] left-1/2 transform -translate-x-1/2">
@@ -124,8 +124,8 @@ export default function LandingPage() {
             </a>
         </div>
         {/* Core strengths */}
-        <div className="bg-blue-100/35 text-center w-full px-4 pt-9 pb-12">
-            <h2 className="text-center text-xl sm:text-3xl font-bold text-black mb-10 sm:mb-12">Our Core Strengths</h2>
+        <div className="bg-blue-100/35 dark:bg-gradient-to-b dark:from-blue-950/90 dark:to-black text-center w-full px-4 pt-9 pb-12">
+            <h2 className="text-center text-xl sm:text-3xl font-bold text-black dark:text-white/70 mb-10 sm:mb-12">Our Core Strengths</h2>
             <div className="flex flex-wrap sm:flex-row md:flex-nowrap gap-8 sm:gap-6 md:gap-0 justify-center mb-7 sm:mb-10 max-w-5xl mx-auto">
                 <div className="text-center border-0 md:border-r px-2 sm:px-4 lg:px-10">
                 <Image
@@ -136,7 +136,7 @@ export default function LandingPage() {
                     className="mx-auto mb-5"
                     priority
                         />
-                <p className="text-sm sm:text-md lg:text-xl font-medium sm:font-semibold text-black">Best Rates of Exchange</p>
+                <p className="text-sm sm:text-md lg:text-xl font-medium sm:font-semibold text-black dark:text-white/80">Best Rates of Exchange</p>
                 </div>
                 <div className="text-center border-0 md:border-r px-2 sm:px-4 lg:px-10">
                     <Image
@@ -147,7 +147,7 @@ export default function LandingPage() {
                     className="mx-auto mb-5"
                     priority
                     />
-                <p className="text-sm sm:text-md lg:text-xl font-medium sm:font-semibold text-black">No Commission or Fees</p></div>
+                <p className="text-sm sm:text-md lg:text-xl font-medium sm:font-semibold text-black dark:text-white/80">No Commission or Fees</p></div>
                 <div className="text-center px-2 sm:px-4 lg:px-10">
                     <Image
                     src="/images/icon3.png"
@@ -157,11 +157,11 @@ export default function LandingPage() {
                     className="mx-auto w-14 mb-4 sm:mb-5"
                     priority
                     />
-                <p className="text-sm sm:text-md lg:text-xl font-medium sm:font-semibold text-black">Excellent Service</p>
+                <p className="text-sm sm:text-md lg:text-xl font-medium sm:font-semibold text-black dark:text-white/80">Excellent Service</p>
                 </div>
             </div>
             <p className="mx-auto text-justify text-sm sm:text-md lg:text-xl [text-align-last:center]
-            max-w-2xl text-black">"Experience the difference with MTA Currency Exchange. Unlike traditional high street shops and banks, we offer a tailored approach to currency exchange. With a dedicated account executive by your side, you'll enjoy a personalized service that prioritizes your needs and secures the best rates."
+            max-w-2xl text-black dark:text-white/80">"Experience the difference with MTA Currency Exchange. Unlike traditional high street shops and banks, we offer a tailored approach to currency exchange. With a dedicated account executive by your side, you'll enjoy a personalized service that prioritizes your needs and secures the best rates."
             </p>
            </div>
            <MoneyTransferComp showAuth={true} showGlobalPartners={true} />

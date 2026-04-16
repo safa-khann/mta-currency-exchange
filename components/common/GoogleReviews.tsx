@@ -177,7 +177,7 @@ export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
           {currentIndex > 0 && (
             <button
               onClick={handlePrevious}
-              className="absolute -left-4 sm:left-0 top-[50%] z-10 bg-white shadow-lg rounded-full p-2 sm:p-3 hover:bg-gray-100 transition-all"
+              className="absolute -left-4 sm:left-0 top-[50%] z-10 bg-white dark:bg-black shadow-lg rounded-full p-2 sm:p-3 hover:bg-gray-100 transition-all"
               aria-label="Previous review"
             >
               <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,7 +305,7 @@ export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
           {currentIndex < maxIndex && (
             <button
               onClick={handleNext}
-              className="absolute -right-4 sm:right-0 top-[50%] z-10 bg-white shadow-lg rounded-full p-2 sm:p-3 hover:bg-gray-100 transition-all"
+              className="absolute -right-4 sm:right-0 top-[50%] z-10 bg-white dark:bg-black shadow-lg rounded-full p-2 sm:p-3 hover:bg-gray-100 transition-all"
               aria-label="Next review"
             >
               <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -60,7 +60,7 @@ export default function Header() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled || isHomeDeliveryPage? 'bg-blue-950 shadow-md' : 'bg-transparent'
+          isScrolled || isHomeDeliveryPage? 'bg-blue-950 dark:bg-black dark:bg-gradient-to-b dark:from-blue-950/70 dark:to-blue-950/70 shadow-md' : 'bg-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">

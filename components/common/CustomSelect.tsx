@@ -69,7 +69,7 @@ const selectedOption = options.find(opt => opt.value === value);
               {selectedOption.icon}
             </span>
           )}
-          <span className="font-medium truncate">
+          <span className="font-medium text-black truncate">
             {selectedOption?.label || placeholder}
           </span>
         </div>
@@ -87,7 +87,7 @@ const selectedOption = options.find(opt => opt.value === value);
                 w-full p-2 text-left text-xs 
                 flex items-center justify-between
                 hover:bg-gray-50 cursor-pointer
-                transition-colors duration-150
+                transition-colors duration-150 text-black
                
               `}
               onClick={() => {
@@ -95,7 +95,7 @@ const selectedOption = options.find(opt => opt.value === value);
                 setIsOpen(false);
               }}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex text-black items-center gap-2">
                 {/* Show icon in dropdown items */}
                 {option.icon && (
                   <span className="flex-shrink-0">

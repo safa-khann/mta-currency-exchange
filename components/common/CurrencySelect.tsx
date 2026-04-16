@@ -40,7 +40,7 @@ export const CurrencySelect : React.FC<CurrencySelectProps> = ({ value, onChange
       >
         <div className="flex items-center gap-2">
           <span className={`flag-icon flag-icon-${selectedOption?.country} text-md`}></span>
-          <span className='text-xs sm:text-sm'>{selectedOption?.code}-{selectedOption?.countryName}</span>
+          <span className='text-xs text-black sm:text-sm'>{selectedOption?.code}-{selectedOption?.countryName}</span>
         </div>
         <ChevronDown className={`w-4 h-4 ml-2 text-gray-800 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
@@ -57,7 +57,7 @@ export const CurrencySelect : React.FC<CurrencySelectProps> = ({ value, onChange
               }}
             >
               <span className={`flag-icon flag-icon-${option.country} text-lg w-30`}></span>
-              <span className='text-xs'>{option.countryName} - {option.currency} ({option.code})</span>
+              <span className='text-black text-xs'>{option.countryName} - {option.currency} ({option.code})</span>
             </div>
           ))}
         </div>

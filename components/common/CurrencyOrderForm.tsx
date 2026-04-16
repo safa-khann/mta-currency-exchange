@@ -96,33 +96,29 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
       try {
         // ALWAYS check for buy cart
         const savedBuyCart = localStorage.getItem('buyCurrencyCart');
-        console.log('Buy cart from localStorage:', savedBuyCart);
+        // console.log('Buy cart from localStorage:', savedBuyCart);
         
         if (savedBuyCart) {
           const parsedBuyCart = JSON.parse(savedBuyCart);
-          console.log('Parsed buy cart:', parsedBuyCart);
+          // console.log('Parsed buy cart:', parsedBuyCart);
           setBuyCartItems(parsedBuyCart);
         } else {
-          console.log('No buy cart found in localStorage');
+          // console.log('No buy cart found in localStorage');
           setBuyCartItems([]); // Ensure it's empty if not found
         }
         
         // ALWAYS check for sell cart
         const savedSellCart = localStorage.getItem('sellCurrencyCart');
-        console.log('Sell cart from localStorage:', savedSellCart);
+        // console.log('Sell cart from localStorage:', savedSellCart);
         
         if (savedSellCart) {
           const parsedSellCart = JSON.parse(savedSellCart);
-          console.log('Parsed sell cart:', parsedSellCart);
+          // console.log('Parsed sell cart:', parsedSellCart);
           setSellCartItems(parsedSellCart);
         } else {
-          console.log('No sell cart found in localStorage');
+          // console.log('No sell cart found in localStorage');
           setSellCartItems([]); // Ensure it's empty if not found
         }
-        
-        // Remove the check for old 'currencyCart' key completely
-        // This is confusing your logic
-        // const savedCart = localStorage.getItem('currencyCart'); // REMOVE THIS
         
       } catch (error) {
         console.error('Error parsing carts from localStorage:', error);
@@ -135,7 +131,7 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
   };
   
   // Load immediately on mount
-  console.log('Loading cart on component mount...');
+  // console.log('Loading cart on component mount...');
   loadCart();
   
   // Also listen for storage events
@@ -292,7 +288,7 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
       rate: getCurrentRate(),
       type: 'collect'
     };
-    console.log('Adding item with transactionType:', selectedOption); 
+    // console.log('Adding item with transactionType:', selectedOption); 
     if (isHomePage) {
     // Get existing cart from localStorage
     if (selectedOption === 'buy') {
@@ -567,7 +563,7 @@ const handleSubmitOrder = async () => {
       {/* 80% width box */}     
       <div className=" w-[95%] sm:w-[90%] 2xl:w-[70%] p-4 pt-4 pb-6 md:p-5 lg:px-6 lg:pt-5 lg:pb-3 absolute top-[-120px] left-1/2 transform -translate-x-1/2 z-20 mx-auto bg-white shadow-equal-sm" style={{borderRadius:'50px'}}>
         {/* Heading */}
-        <h2 className="text-xl sm:text-3xl font-bold text-center mb-5 md:mb-8">{heading}</h2>          
+        <h2 className="text-xl sm:text-3xl font-bold text-black text-center mb-5 md:mb-8">{heading}</h2>          
            <div className="flex flex-col flex-wrap sm:flex-row justify-center gap-2 md:gap-3 md:mb-4 lg:mb-6">
         {/* Buy/Sell Option Select */}
         <div className="p-2 flex font-medium border h-9.5 bg-grayblue-l">
@@ -604,13 +600,13 @@ const handleSubmitOrder = async () => {
         {/* GBP Input */}
         <div className="flex w-full sm:w-auto gap-1 sm:gap-3">
             <div className="flex w-full md:w-35 h-9.5 items-center border bg-grayblue-l overflow-hidden">
-            <p className="pl-2 py-1 text-xs sm:text-sm font-medium">
+            <p className="pl-2 py-1 text-xs sm:text-sm text-black font-medium">
                 {selectedOption === 'buy' ? 'GBP' : (selectedCurrencyData?.currency_code || selectedCurrency)}
               </p>
               <input
                 type="number"
                 placeholder="0.00"
-                className="p-1 text-xs sm:text-sm w-full font-medium outline-none"
+                className="p-1 text-xs sm:text-sm text-black w-full font-medium outline-none"
                 value={selectedOption === 'buy' ? gbpAmount : foreignAmount}
                 onChange={(e) => selectedOption === 'buy' ? handleGbpChange(e.target.value) : handleForeignChange(e.target.value)}
               />
@@ -621,13 +617,13 @@ const handleSubmitOrder = async () => {
             <ArrowRightLeft className="color-grayblue" size={33}/>
         {/* Rate Display */}
         <div className="text-start w-auto">
-            <span className="text-xs sm:text-sm font-semibold mb-0 mr-2 leading-tight">Rate:</span>
+            <span className="text-xs text-black sm:text-sm font-semibold mb-0 mr-2 leading-tight">Rate:</span>
             {isLoading ? (
                   <div className="animate-pulse h-4 w-12 bg-gray-200 rounded"></div>
                 ) : error ? (
                   <span className="text-xs text-red-500">Error</span>
                 ) : (
-                  <p className="text-xs sm:text-sm font-medium mb-0 font-bold leading-tight">
+                  <p className="text-xs sm:text-sm text-black font-medium mb-0 font-bold leading-tight">
                     {rate.toFixed(4)}
                   </p>
                 )}
@@ -636,13 +632,13 @@ const handleSubmitOrder = async () => {
 
             {/* Foreign Currency Input */}       
             <div className="flex items-center h-9.5 bg-grayblue-l border w-full md:w-35 overflow-hidden">
-            <div className="pl-2 text-xs sm:text-sm font-medium">
+            <div className="pl-2 text-xs text-black sm:text-sm font-medium">
                 {selectedOption === 'buy' ? (selectedCurrencyData?.currency_code || selectedCurrency) : 'GBP'}
               </div>
               <input
                 type="number"
                 placeholder="0.00"
-                className="p-2 w-full outline-none text-xs sm:text-sm font-medium"
+                className="p-2 w-full outline-none text-black text-xs sm:text-sm font-medium"
                 value={selectedOption === 'buy' ? foreignAmount : gbpAmount}
                 onChange={(e) => selectedOption === 'buy' ? handleForeignChange(e.target.value) : handleGbpChange(e.target.value)}
               />
@@ -714,7 +710,7 @@ const handleSubmitOrder = async () => {
               <input
                 type="text"
                 placeholder="First Name"
-                className={`w-full px-4 text-sm h-10 border ${formErrors.first_name ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
+                className={`w-full px-4 text-sm text-black! h-10 border ${formErrors.first_name ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
                 // className="flex-1 px-4 text-sm h-10 border border-gray-400 bg-gray-100/70"
                 value={first_name}
                 // onChange={(e) => set_first_name(e.target.value)}
@@ -730,7 +726,7 @@ const handleSubmitOrder = async () => {
               <input
                 type="text"
                 placeholder="Last Name"
-                className={`px-2 w-full text-sm h-10 border  ${formErrors.last_name ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
+                className={`px-2 w-full text-sm h-10 border text-black! ${formErrors.last_name ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
                 value={last_name}
                 onChange={(e) => {set_last_name(e.target.value); validateField('last_name', e.target.value);}}
               />
@@ -745,7 +741,7 @@ const handleSubmitOrder = async () => {
               <input
                 type="email"
                 placeholder="Email Address"
-                className={`px-4 w-full text-sm h-10 border  ${formErrors.email ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
+                className={`px-4 w-full text-sm h-10 border text-black! ${formErrors.email ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
                 value={email}
                 onChange={(e) => {setEmail(e.target.value); validateField('email', e.target.value);}}
               />
@@ -757,7 +753,7 @@ const handleSubmitOrder = async () => {
               <input
                 type="tel"
                 placeholder="Mobile"
-                className={`px-4 w-full text-sm h-10 border  ${formErrors.mobile ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
+                className={`px-4 w-full text-sm h-10 border text-black! ${formErrors.mobile ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
                 value={mobile}
                 onChange={(e) => {setMobile(e.target.value); validateField('mobile', e.target.value);}}
               />
@@ -769,7 +765,7 @@ const handleSubmitOrder = async () => {
 
             {/* Collection Info */}
             <div className="mb-3 sm:mb-6">
-              <p className="font-bold text-sm text-gray-900 mb-2">
+              <p className="font-bold text-sm text-gray-900 dark:text-white/80 mb-2">
                 For collection, you can visit any time between Working Hours
               </p>
               <div>
@@ -788,7 +784,7 @@ const handleSubmitOrder = async () => {
              
               <textarea
                 placeholder="Special Instructions"
-                className="w-full pl-5 pb-3 pr-4 py-2 text-sm border border-gray-400 bg-gray-100/70 mt-3"
+                className="w-full pl-5 pb-3 pr-4 py-2 text-sm border border-gray-400 bg-gray-100/70 text-black! mt-3"
                 rows={4}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -804,7 +800,7 @@ const handleSubmitOrder = async () => {
                   checked={mailingList}
                   onChange={(e) => setMailingList(e.target.checked)}
                 />
-                <span className="text-gray-800 text-sm">
+                <span className="text-gray-800 dark:text-white/80 text-sm">
                   Never miss a travel money deal. Sign up to our mailing list to stay up to date. 
                   If you would like more information on how we handle your data or on how to unsubscribe 
                   from our mailing list, check our <a href='/terms-and-conditions' className='text-blue-500 hover:text-blue-700'>Terms and Conditions</a> and <a href='/privacy-policy' className='text-blue-500 hover:text-blue-700'>Privacy Policy</a>. 
@@ -815,7 +811,7 @@ const handleSubmitOrder = async () => {
             </div>
 
             {/* Terms Reminder */}
-            <p className="text-gray-800 text-sm mb-4">
+            <p className="text-gray-800 dark:text-white/80 text-sm mb-4">
               Please visit branch with your valid photo identity proof. To know more read <a href='/terms-and-conditions' className='text-blue-500 hover:text-blue-700'>Terms and Conditions</a>
             </p>
 

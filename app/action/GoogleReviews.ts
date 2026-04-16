@@ -8,7 +8,7 @@ export async function getGoogleReviews(placeId: string) {
     throw new Error('Google Places API key is not configured');
   }
 
-  console.log('🔍 Fetching reviews for place:', placeId);
+  // console.log('🔍 Fetching reviews for place:', placeId);
   
   try {
     const url = `https://places.googleapis.com/v1/places/${placeId}`;
@@ -24,7 +24,7 @@ export async function getGoogleReviews(placeId: string) {
       cache: 'no-store'
     });
 
-    console.log('📊 Response status:', response.status);
+    // console.log('📊 Response status:', response.status);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -33,7 +33,7 @@ export async function getGoogleReviews(placeId: string) {
     }
 
     const data = await response.json();
-    console.log('✅ Reviews fetched successfully:', data);
+    // console.log('✅ Reviews fetched successfully:', data);
     return data;
     
   } catch (error) {
