@@ -11,10 +11,10 @@ const MoneyTransferComp:React.FC<MoneyTransferProps> = ({
     <>
        {/* Authorised */}
        {showAuth && (
-        <div id="money-transfer" className=" w-full dark:bg-black px-4 pt-9 sm:pt-14 sm:px-8 lg:px-18 pb-5 sm:pb-10">
-            <h2 className="text-xl sm:text-3xl font-bold text-black dark:text-white/70 mb-5 sm:mb-7">Authorised By</h2>
+        <div id="money-transfer" className=" w-full dark:bg-black px-4 pt-12 sm:pt-14 sm:px-8 lg:px-18 pb-5 sm:pb-10">
+            <h2 className="text-xl text-center sm:text-3xl font-bold text-black dark:text-white/70 mb-5 sm:mb-7">Authorised By</h2>
            
-            <div className="max-w-2xl mx-auto flex flex-wrap sm:flex-row gap-0  justify-between items-center">
+            <div className="max-w-2xl mx-auto flex flex-wrap sm:flex-row gap-10  justify-center items-center">
                 <Image
                     src="/images/fca.png"
                 alt="Authorised by Financial Conduct Authority UK"
@@ -28,7 +28,7 @@ const MoneyTransferComp:React.FC<MoneyTransferProps> = ({
                 alt="Authorised by HM Revenue & Customs"
                 width={180}
                 height={40}
-                className="w-35 sm:w-60"
+                className="w-35 sm:w-55"
                 priority
                 />
            
@@ -38,8 +38,8 @@ const MoneyTransferComp:React.FC<MoneyTransferProps> = ({
         {/* Global partners */}
         {showGlobalPartners && (
         <div className=" w-full px-4 dark:bg-black pt-10 sm:pt-0 md:pt-8 sm:px-8 lg:px-18 pb-0">
-            <h2 className="text-start text-xl sm:text-3xl font-bold text-black dark:text-white/70 mb-5 sm:mb-8">Global Partners</h2>
-            <div className="max-w-2xl mx-auto flex flex-wrap sm:flex-row gap-0 justify-between items-center">
+            <h2 className="text-center text-xl sm:text-3xl font-bold text-black dark:text-white/70 mb-5 sm:mb-8">Global Partners</h2>
+            <div className="max-w-full flex flex-wrap sm:flex-row gap-10 justify-center items-center">
                 <Image
                     src="/images/moneygram logo.png"
                 alt="Moneygram"
@@ -61,7 +61,7 @@ const MoneyTransferComp:React.FC<MoneyTransferProps> = ({
                 alt="Riya Money Transfer"
                 width={200}
                 height={200}
-                className="mx-auto w-35 sm:w-60"
+                className=" w-35 sm:w-60"
                 priority
                 />
             </div>

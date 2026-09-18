@@ -1,6 +1,6 @@
 'use client'
 
-import { getGoogleReviews } from '@/app/action/GoogleReviews';
+// import { getGoogleReviews } from '@/app/action/GoogleReviews'; // Google Places API reviews disabled — using static reviews below
 import { useEffect, useState, useRef } from 'react';
 
 interface Review {
@@ -19,6 +19,44 @@ interface GoogleReviewsProps {
   placeId: string;
 }
 
+const STATIC_REVIEWS: Review[] = [
+  { authorAttribution: { displayName: 'Ahmz' }, text: { text: 'Great service and very friendly staff. highly recommend for best rates' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Jeffrey Ebhota' }, text: { text: 'The reception is very friendly and accommodating when attending to me. This is one of the best centre I have ever been too.' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'teresa Asprilla' }, text: { text: 'Best exchange rate for sale euro .' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Isabella Souza' }, text: { text: 'A great place to misplace money, polite and nice people' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Efim Mocanu' }, text: { text: 'I always use for ria payouts. Highly recommend' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Shyqyri' }, text: { text: 'Best exhange rate' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Eli' }, text: { text: 'Best exchange shop in grays' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Nozrul Islam' }, text: { text: 'Very polite staff.thanks guys' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Faisal Khan' }, text: { text: 'Great service, recently used to send money through western union, money transfered within seconds. I will definitely use again in future. Thanks adeel' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Simon Kidane' }, text: { text: "It's good customer service very friendly" }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Deandra Senior' }, text: { text: 'Things agwaan fi the shop great service blessings everytime 😊🙏 …' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Silvia Cabral' }, text: { text: 'always use them services.many thanks' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'M Daniel' }, text: { text: 'Just exchanged my euros today and got the best rates here very satisfactory and good customer service as well.' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Eugen' }, text: { text: 'So services. Highly recommended' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Elena Topada' }, text: { text: 'Very good moneygram .. very good expiriance' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Darinel Reyes jaquez' }, text: { text: 'Good man' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Michael Ekama' }, text: { text: 'Great service' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Denis Asya' }, text: { text: 'Very good' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Costy Homea' }, text: { text: 'Best exchange rate .' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Cristi Tudor' }, text: { text: 'Good rates for money transfer and exchange' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Meryem Mimi' }, text: { text: 'Highly recommended for exchange currency' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Sasho Andonoww' }, text: { text: 'Come all the way from basildon for payout.thanks adeel' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Mustapha Saho' }, text: { text: 'Good rate for Gambia.' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Cephas Zindoga' }, text: { text: 'Bedtime saves at all times' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Tahir Javed' }, text: { text: 'Excellent service.best rates in grays' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Shauqat Ali' }, text: { text: 'Best exchange rate in grays' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Shribas Halder' }, text: { text: 'Best rate in bangladesh currency in the shop.' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Maninder Kaur' }, text: { text: 'Good rate for India' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Bobby James Asante' }, text: { text: 'Good job' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'โชติกา บุญญเดชนนท์' }, text: { text: 'Good sw' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Ali Amirr' }, text: { text: 'Five stars service' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'the_best_21 21' }, text: { text: 'Good service' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'Rifat Dilek' }, text: { text: 'Top services' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'GARY Brown' }, text: { text: 'Yam man' }, rating: 5, relativePublishTimeDescription: '' },
+  { authorAttribution: { displayName: 'madiana Munu' }, text: { text: 'Fast and secure.' }, rating: 5, relativePublishTimeDescription: '' },
+];
+
 export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,19 +69,23 @@ export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
   const [visibleCards, setVisibleCards] = useState(1);
 
   useEffect(() => {
-    async function fetchReviews() {
-      try {
-        const data = await getGoogleReviews(placeId);
-        setReviews(data.reviews || []);
-        setRating(data.rating || 0);
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
+    // Google Places API reviews fetch disabled — using static reviews instead
+    // async function fetchReviews() {
+    //   try {
+    //     const data = await getGoogleReviews(placeId);
+    //     setReviews(data.reviews || []);
+    //     setRating(data.rating || 0);
+    //   } catch (error) {
+    //     console.error('Error:', error);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // }
+    // fetchReviews();
 
-    fetchReviews();
+    setReviews(STATIC_REVIEWS);
+    setRating(5);
+    setLoading(false);
   }, [placeId]);
 
   // Get number of visible cards based on screen size
@@ -170,7 +212,7 @@ export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
   }
 
   return (
-    <div className="relative my-10 sm:my-5 w-full">
+    <div className="relative my-10 sm:my-25 w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative">
           {/* Left Arrow */}
@@ -186,16 +228,16 @@ export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
             </button>
           )}
 
-          <h2 className='mb-0 text-xl mb-2 sm:text-3xl font-bold'>Reviews</h2>
-          <div className='grid grid-cols-1 md:grid-cols-2 mb-10'>
-            <div className=" flex items-center gap-0 text-xl font-bold">
+          <h2 className='mb-0 text-xl mb-0 text-center sm:text-3xl font-bold'>Reviews</h2>
+          <div className='flex flex-col items-center justify-center'>
+            <div className=" text-center flex items-center gap-0 text-xl font-bold">
             <span style={{ color: '#4285F4' }}>G</span>
             <span style={{ color: '#EA4335' }}>o</span>
             <span style={{ color: '#FBBC04' }}>o</span>
             <span style={{ color: '#4285F4' }}>g</span>
             <span style={{ color: '#34A853' }}>l</span>
             <span style={{ color: '#EA4335' }}>e</span>
-            <span className='font-light text-xl ml-1 px-2'>{rating.toFixed(1)}</span>
+            <span className='font-light text-md ml-1 px-2'>{rating.toFixed(1)}</span>
             <div className="flex items-end">
               {[...Array(5)].map((_, i) => (
                 <span
@@ -205,15 +247,15 @@ export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
                   ★
                 </span>
               ))}
-              <span className='font-light text-xl px-2'>Rating</span>
+              <span className='font-light text-md px-2'>Rating</span>
             </div>
 
-          </div>
-          <a href="https://www.google.com/maps/place/MTA+worldwide+Currency+Exchange+%26+Money+Transfer/@51.4769918,0.3226627,17z/data=!4m8!3m7!1s0x47d8b792e960dbdb:0x19994416c2535aa9!8m2!3d51.4769918!4d0.3226627!9m1!1b1!16s%2Fg%2F11m5fjwvxt?entry=ttu&g_ep=EgoyMDI2MDIwNC4wIKXMDSoASAFQAw%3D%3D" 
-          className="text-sm w-50 text-center mt-3 ms-0 md:ms-auto bg-blue-950 cursor-pointer my-auto text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
-          target='_blank'>
-              Give a Review
-          </a>
+            </div>
+            <a href="https://www.google.com/maps/place/MTA+worldwide+Currency+Exchange+%26+Money+Transfer/@51.4769918,0.3226627,17z/data=!4m8!3m7!1s0x47d8b792e960dbdb:0x19994416c2535aa9!8m2!3d51.4769918!4d0.3226627!9m1!1b1!16s%2Fg%2F11m5fjwvxt?entry=ttu&g_ep=EgoyMDI2MDIwNC4wIKXMDSoASAFQAw%3D%3D" 
+            className="text-sm w-50 text-center bg-blue-950 cursor-pointer mt-5 text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+            target='_blank'>
+                Give a Review
+            </a>
             
           </div>
 
@@ -228,7 +270,7 @@ export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
             onTouchEnd={handleMouseUp}
             onTouchMove={handleTouchMove}
             onScroll={handleScroll}
-            className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+            className="flex gap-4 overflow-x-auto py-15 scrollbar-hide snap-x snap-mandatory"
             style={{ 
               cursor: isDragging ? 'grabbing' : 'grab',
               scrollbarWidth: 'none',
@@ -239,7 +281,7 @@ export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
             {reviews.map((review, index) => (
               <div
                 key={index}
-                className="flex-none"
+                className="flex-none shadow-equal-md rounded-xl"
                 style={{ 
                   width: `calc((100% - ${(visibleCards - 1) * 1}rem) / ${visibleCards})`,
                   minWidth: '280px',

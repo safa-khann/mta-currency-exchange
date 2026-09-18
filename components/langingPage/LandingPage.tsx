@@ -124,7 +124,7 @@ export default function LandingPage() {
             </a>
         </div>
         {/* Core strengths */}
-        <div className="bg-blue-100/35 dark:bg-gradient-to-b dark:from-blue-950/90 dark:to-black text-center w-full px-4 pt-9 pb-12">
+        <div className="bg-blue-100/35 dark:bg-gradient-to-b dark:from-blue-950/90 dark:to-black text-center w-full px-4 pt-10 pb-12">
             <h2 className="text-center text-xl sm:text-3xl font-bold text-black dark:text-white/70 mb-10 sm:mb-12">Our Core Strengths</h2>
             <div className="flex flex-wrap sm:flex-row md:flex-nowrap gap-8 sm:gap-6 md:gap-0 justify-center mb-7 sm:mb-10 max-w-5xl mx-auto">
                 <div className="text-center border-0 md:border-r px-2 sm:px-4 lg:px-10">
