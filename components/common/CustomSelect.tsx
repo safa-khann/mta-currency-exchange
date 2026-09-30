@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 interface Option {
   value: string;
   label: string;
-  icon?: React.ReactNode; // Add icon prop
+  icon?: React.ReactNode;
   color?: string;
 }
 
@@ -15,112 +15,97 @@ interface CustomSelectProps {
   className?: string;
   buttonstyling?: string;
   placeholder?: string;
-  showIconInButton?: boolean; // Control whether to show icon in button
+  showIconInButton?: boolean;
+  id?: string;
+  invalid?: boolean;
 }
 
-export function CustomSelect({ 
-  value, 
-  onChange, 
-  options, 
-  className = '', 
+export function CustomSelect({
+  value,
+  onChange,
+  options,
+  className = '',
   buttonstyling = '',
   placeholder = 'Select',
-  showIconInButton = true // Default to true
+  showIconInButton = true,
+  id,
+  invalid = false,
 }: CustomSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Use first option as selected if no value is provided
-//   const selectedOption = options.find(opt => opt.value === value) || options[0];
-const selectedOption = options.find(opt => opt.value === value);
+  const selectedOption = options.find((opt) => opt.value === value);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
-
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
   }, []);
 
+  // A single option is selected automatically (e.g. one branch, one payment method).
   useEffect(() => {
     if (options.length === 1 && !value) {
       onChange(options[0].value);
     }
   }, [options, value, onChange]);
 
-
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
-      {/* Selected option display */}
       <button
+        id={id}
         type="button"
-        className={`${buttonstyling}
-          w-full transition-all duration-200 cursor-pointer flex items-center justify-between
-          
-        `}
+        className={`flex h-12 w-full cursor-pointer items-center justify-between gap-2 rounded-xl border bg-white px-4 text-left text-[0.9375rem] transition-colors ${
+          invalid ? 'border-danger' : 'border-line hover:border-ink/25'
+        } ${buttonstyling}`}
         onClick={() => setIsOpen(!isOpen)}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
       >
-        <div className="flex items-center gap-2">
-          {/* Show icon if provided and showIconInButton is true */}
-          {showIconInButton && selectedOption?.icon && (
-            <span className="flex-shrink-0">
-              {selectedOption.icon}
-            </span>
-          )}
-          <span className="font-medium text-black truncate">
+        <span className="flex min-w-0 items-center gap-2">
+          {showIconInButton && selectedOption?.icon && <span className="shrink-0">{selectedOption.icon}</span>}
+          <span className={`truncate ${selectedOption ? 'text-ink' : 'text-subtle'}`}>
             {selectedOption?.label || placeholder}
           </span>
-        </div>
-        <ChevronDown className={`w-4 h-4 ml-2 text-gray-800 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </span>
+        <ChevronDown className={`h-4 w-4 shrink-0 text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
       </button>
 
-      {/* Dropdown menu */}
       {isOpen && options.length > 0 && (
-        <div className="absolute z-80 mt-1 w-full bg-white border border-gray-200 shadow-lg overflow-hidden">
+        <ul
+          role="listbox"
+          className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-line bg-white p-1.5 shadow-float animate-fade-up"
+        >
           {options.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              className={`
-                w-full p-2 text-left text-xs 
-                flex items-center justify-between
-                hover:bg-gray-50 cursor-pointer
-                transition-colors duration-150 text-black
-               
-              `}
-              onClick={() => {
-                onChange(option.value);
-                setIsOpen(false);
-              }}
-            >
-              <div className="flex text-black items-center gap-2">
-                {/* Show icon in dropdown items */}
-                {option.icon && (
-                  <span className="flex-shrink-0">
-                    {option.icon}
-                  </span>
-                )}
-                {option.label}
-              </div>
-              {option.value === value && (
-                <Check className="w-4 h-4 text-gray-800" />
-              )}
-            </button>
+            <li key={option.value} role="option" aria-selected={option.value === value}>
+              <button
+                type="button"
+                className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-left text-sm text-ink transition-colors hover:bg-canvas"
+                onClick={() => {
+                  onChange(option.value);
+                  setIsOpen(false);
+                }}
+              >
+                <span className="flex items-center gap-2">
+                  {option.icon && <span className="shrink-0">{option.icon}</span>}
+                  {option.label}
+                </span>
+                {option.value === value && <Check className="h-4 w-4 shrink-0 text-ink" aria-hidden="true" />}
+              </button>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );
 }
-
-        //  className={`
-        //   w-full sm:w-48 md:w-32 px-4 py-2.5 text-xs sm:text-sm
-        //   flex items-center justify-between
-        //   border border-gray-300 rounded-lg 
-        //   bg-white text-gray-700
-        //   hover:border-gray-400 
-        //   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-        //   transition-all duration-200
-        // `}

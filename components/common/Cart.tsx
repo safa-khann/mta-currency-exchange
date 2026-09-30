@@ -1,7 +1,6 @@
-// components/CurrencyCart.tsx
 "use client"
 import React from 'react';
-import { X } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 
 export interface CartItem {
   id: string;
@@ -16,7 +15,7 @@ export interface CartItem {
     code: string;
     name: string;
     country: string;
-    countryName:string;
+    countryName: string;
     flag: string;
     amount: string;
   };
@@ -32,132 +31,72 @@ interface CurrencyCartProps {
   className?: string;
 }
 
-const CurrencyCart: React.FC<CurrencyCartProps> = ({ 
-  items, 
-  onRemoveItem, 
-  onUpdateItem,
-  className = '' 
-}) => {
-  const getFlagEmoji = (countryCode: string) => {
-    const codePoints = countryCode.toUpperCase()
-      .split('')
-      .map(char => 127397 + char.charCodeAt(0));
-    return String.fromCodePoint(...codePoints);
-  };
+const formatAmount = (amount: string) =>
+  Number(amount).toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+function Money({ flag, amount, code }: { flag: string; amount: string; code: string }) {
+  return (
+    <span className="flex items-center gap-2">
+      <span className={`flag-icon flag-icon-${flag.toLowerCase()} shrink-0 rounded-[3px]`} aria-hidden="true" />
+      <span className="tabular font-semibold text-ink">{formatAmount(amount)}</span>
+      <span className="text-sm text-muted">{code}</span>
+    </span>
+  );
+}
+
+const CurrencyCart: React.FC<CurrencyCartProps> = ({ items, onRemoveItem, className = '' }) => {
   if (items.length === 0) {
-    return (
-      <div className={`p-0 text-center text-gray-500 ${className}`}>
-        
-      </div>
-    );
+    return null;
   }
 
+  const totalGbp = items.reduce((sum, item) => sum + parseFloat(item.fromCurrency.amount), 0);
+  const allBuy = items.every((item) => item.transactionType === 'buy');
+  const allSell = items.every((item) => item.transactionType === 'sell');
+  const totalLabel = allBuy ? 'Total to pay' : allSell ? 'Total you receive' : 'Total (GBP)';
+
   return (
-    <div className={`w-full transition-all duration-300 ${className}`}>
-      <h3 className="text-xl sm:text-3xl font-bold mb-4">Your Order <span className='text-sm sm:text-lg font-normal'>(Add More Currencies)</span></h3>
-      
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse [table-layout:fixed] sm:[table-layout:auto]">
-          <thead>
-            <tr className="bg-gray-100 text-sm">
-              <th className="border-b border-gray-300 px-4 py-2 text-left w-[190px] md:w-auto">From</th>
-              <th className="border-b border-gray-300 px-4 py-2 text-left w-[190px] md:w-auto">To</th>
-              <th className="border-b border-gray-300 px-4 py-2 text-left w-[80px] md:w-auto">Buy/Sell</th>
-              <th className="border-b border-gray-300 px-4 py-2 text-left w-[90px] md:w-auto">Rate</th>
-              <th className="border-b border-gray-300 px-4 py-2 text-left w-[90px] md:w-auto">Type</th>
-              <th className="border-b border-gray-300 px-4 py-2 text-left w-[50px] md:w-auto"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id} className="hover:bg-gray-50">
-                {/* From Column */}
-                <td className="border-b border-gray-200 px-4 py-2 w-[180px] md:w-auto">
-                  <div className="flex flex-row items-center gap-2">
-                    {/* <span className="text-xl">{getFlagEmoji('gb')}</span> */}
-                    {item.transactionType === 'buy' ?(
-                      <>
-                      <span className={`flag-icon flag-icon-gb text-md`}></span>
-                    <div className="text-sm font-medium">{item.fromCurrency.amount} GBP - UK</div>
-                    </>):(
-                      <> 
-                       <span className={`flag-icon flag-icon-${item.toCurrency.country.toLowerCase()} text-md`}></span>
-                    <div>
-                      <p className="text-sm font-medium">{item.toCurrency.amount} {item.toCurrency.code} - {item.toCurrency.countryName}</p>
-                    </div> 
-                      </>
-                    )}
-                    
-                  </div>
-                </td>
-                
-                {/* To Column */}
-                <td className="border-b border-gray-200 px-4 py-2 w-[180px] md:w-auto">
-                  <div className="flex items-center gap-2">
-                     {item.transactionType === 'buy' ?(
-                      <>
-                      <span className={`flag-icon flag-icon-${item.toCurrency.country.toLowerCase()} text-md`}></span>
-                    <div>
-                      <p className="text-sm font-medium">{item.toCurrency.amount} {item.toCurrency.code} - {item.toCurrency.countryName}</p>
-                    </div> 
-                      </>):(
-                      <> 
-                      <span className={`flag-icon flag-icon-gb text-md`}></span>
-                    <div className="text-sm font-medium">{item.fromCurrency.amount} GBP - UK</div>
-                     
-                      </>
-                    )}
-                    {/* <span className={`flag-icon flag-icon-${item.toCurrency.country.toLowerCase()} text-md`}></span>
-                    <div>
-                      <p className="text-sm font-medium">{item.toCurrency.amount} {item.toCurrency.code} - {item.toCurrency.countryName}</p>
-                    </div> */}
-                  </div>
-                </td>
-                
-                {/* Buy/Sell Column */}
-                <td className="border-b border-gray-200 px-4 py-2">
-                  <span className={` text-sm font-medium ${
-                    item.transactionType === 'buy' 
-                      ? 'text-green-600' 
-                      : 'text-red-600'
-                  }`}>
-                    {item.transactionType.toUpperCase()}
-                  </span>
-                </td>
-                
-                {/* Rate Column */}
-                <td className="border-b border-gray-200 px-4 text-sm py-2 font-medium">
-                  {item.rate.toFixed(4)}
-                </td>
-                
-                {/* Type Column */}
-                <td className="border-b border-gray-200 px-4 py-2">
-                  <span className="bg-yellow-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
-                    {item.type}
-                  </span>
-                </td>
-                
-                {/* Remove Button Column */}
-                <td className="border-b border-gray-200 px-4 py-2">
-                  <button
-                    onClick={() => onRemoveItem(item.id)}
-                    className="bg-gray-100 cursor-pointer text-black hover:text-red-700 hover:bg-red-50 p-2 rounded-full transition-colors"
-                    title="Remove from cart"
+    <div className={className}>
+      <ul className="divide-y divide-line">
+        {items.map((item) => {
+          const gbp = <Money flag="gb" amount={item.fromCurrency.amount} code="GBP" />;
+          const foreign = <Money flag={item.toCurrency.country} amount={item.toCurrency.amount} code={item.toCurrency.code} />;
+          const isBuy = item.transactionType === 'buy';
+          return (
+            <li key={item.id} className="flex items-center gap-4 py-4">
+              <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  {isBuy ? gbp : foreign}
+                  <ArrowRight className="h-4 w-4 text-subtle" aria-label="for" />
+                  {isBuy ? foreign : gbp}
+                </span>
+                <span className="flex items-center gap-2 sm:ml-auto">
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                      isBuy ? 'bg-positive/10 text-positive' : 'bg-navy-soft/10 text-navy-soft'
+                    }`}
                   >
-                    <X size={15} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      
-      {/* Cart Summary */}
-      <div className="border-b bg-gray-100 border-gray-200 py-2 ps-4 text-sm text-gray-600">
-        Total GBP: <span className='text-black font-bold'>{items.reduce((sum, item) => sum + parseFloat(item.fromCurrency.amount), 0).toFixed(2)}</span>
-       
+                    {isBuy ? 'Buy' : 'Sell'}
+                  </span>
+                  <span className="tabular text-xs text-muted">@ {item.rate.toFixed(4)}</span>
+                  <span className="rounded-full bg-canvas px-2.5 py-0.5 text-xs font-medium capitalize text-muted">{item.type}</span>
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => onRemoveItem(item.id)}
+                className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full text-subtle transition-colors hover:bg-danger/10 hover:text-danger"
+                aria-label={`Remove ${item.toCurrency.code} from order`}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="mt-2 flex items-center justify-between rounded-xl bg-canvas px-4 py-3">
+        <span className="text-sm text-muted">{totalLabel}</span>
+        <span className="tabular text-lg font-semibold text-ink">£{formatAmount(totalGbp.toFixed(2))}</span>
       </div>
     </div>
   );

@@ -1,73 +1,50 @@
 import Image from "next/image";
+
 interface MoneyTransferProps {
-    showAuth?:boolean;
-    showGlobalPartners?:boolean;
+  showAuth?: boolean;
+  showGlobalPartners?: boolean;
 }
-const MoneyTransferComp:React.FC<MoneyTransferProps> = ({
-    showAuth,
-    showGlobalPartners
-}) => {
+
+const partners = [
+  { src: '/images/moneygram logo.png', alt: 'MoneyGram', width: 1024, height: 217, className: 'h-7 sm:h-8' },
+  { src: '/images/western union.png', alt: 'Western Union', width: 1080, height: 262, className: 'h-7 sm:h-8' },
+  { src: '/images/riya-money-transfer.png', alt: 'Ria Money Transfer', width: 309, height: 163, className: 'h-14 sm:h-16' },
+];
+
+const regulators = [
+  { src: '/images/fca.png', alt: 'Authorised by the Financial Conduct Authority', width: 252, height: 96, className: 'h-9 sm:h-10' },
+  { src: '/images/hmm.png', alt: 'Registered with HM Revenue & Customs', width: 670, height: 220, className: 'h-11 sm:h-12' },
+];
+
+function LogoRow({ label, logos }: { label: string; logos: typeof partners }) {
   return (
-    <>
-       {/* Authorised */}
-       {showAuth && (
-        <div id="money-transfer" className=" w-full dark:bg-black px-4 pt-12 sm:pt-14 sm:px-8 lg:px-18 pb-5 sm:pb-10">
-            <h2 className="text-xl text-center sm:text-3xl font-bold text-black dark:text-white/70 mb-5 sm:mb-7">Authorised By</h2>
-           
-            <div className="max-w-2xl mx-auto flex flex-wrap sm:flex-row gap-10  justify-center items-center">
-                <Image
-                    src="/images/fca.png"
-                alt="Authorised by Financial Conduct Authority UK"
-                width={180}
-                height={40}
-                className="w-35 sm:w-60"
-                priority
-                />
-                <Image
-                    src="/images/hmm.png"
-                alt="Authorised by HM Revenue & Customs"
-                width={180}
-                height={40}
-                className="w-35 sm:w-55"
-                priority
-                />
-           
-            </div>
-        </div>
-       )}
-        {/* Global partners */}
-        {showGlobalPartners && (
-        <div className=" w-full px-4 dark:bg-black pt-10 sm:pt-0 md:pt-8 sm:px-8 lg:px-18 pb-0">
-            <h2 className="text-center text-xl sm:text-3xl font-bold text-black dark:text-white/70 mb-5 sm:mb-8">Global Partners</h2>
-            <div className="max-w-full flex flex-wrap sm:flex-row gap-10 justify-center items-center">
-                <Image
-                    src="/images/moneygram logo.png"
-                alt="Moneygram"
-                width={180}
-                height={40}
-                className="w-35 sm:w-60"
-                priority
-                />
-                <Image
-                    src="/images/western union.png"
-                alt="Western Union"
-                width={180}
-                height={40}
-                className="w-35 sm:w-60"
-                priority
-                />
-                <Image
-                src="/images/riya-money-transfer.png"
-                alt="Riya Money Transfer"
-                width={200}
-                height={200}
-                className=" w-35 sm:w-60"
-                priority
-                />
-            </div>
-        </div>   
-        )}
-    </>
+    <div className="flex flex-col items-center gap-6 md:flex-row md:gap-10">
+      <p className="shrink-0 text-xs font-semibold uppercase tracking-[0.14em] text-subtle md:w-36">{label}</p>
+      <ul className="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 md:justify-start">
+        {logos.map((logo) => (
+          <li key={logo.alt} className="flex h-16 items-center">
+            <Image
+              src={logo.src}
+              alt={logo.alt}
+              width={logo.width}
+              height={logo.height}
+              className={`${logo.className} w-auto object-contain opacity-70 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0`}
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// Logo strip for money transfer partners and regulators.
+const MoneyTransferComp: React.FC<MoneyTransferProps> = ({ showAuth, showGlobalPartners }) => {
+  return (
+    <div id="money-transfer" className="space-y-8">
+      {showGlobalPartners && <LogoRow label="Global partners" logos={partners} />}
+      {showAuth && showGlobalPartners && <div className="h-px bg-line" />}
+      {showAuth && <LogoRow label="Authorised by" logos={regulators} />}
+    </div>
   );
 };
 

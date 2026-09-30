@@ -1,68 +1,106 @@
 // components/CurrencyOrderForm.tsx
 "use client"
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, ChevronLeft, ArrowDownAZ, ArrowRightIcon, ArrowRightLeft, CrossIcon, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { ArrowDownUp, CheckCircle2, Clock, IdCard, MapPin, Phone, ShieldCheck, Wallet } from 'lucide-react';
 import { CurrencySelect } from './CurrencySelect';
-import Image from 'next/image';
 import CurrencyCart, { CartItem } from './Cart';
 import { CustomSelect } from './CustomSelect';
-import { useRouter } from 'next/navigation';
-import { CurrencyRate, currencyService } from '@/lib/services/currency-service';
 import { getFlagCountryCode } from '@/utils/flagMapping';
 import { useCurrencyRates, useOrderEmail } from '@/lib/hooks/useCurrency';
+import { site } from '@/lib/site';
 
 interface CurrencyOrderFormProps {
   heading: string;
   showOption: 'buy' | 'sell' | 'both';
   showPersonalDetails?: boolean;
-  showCart?:boolean;
+  showCart?: boolean;
   defaultCurrency?: string;
   isHomePage?: boolean;
 }
+
+const inputClass = (invalid?: boolean) =>
+  `h-12 w-full rounded-xl border bg-white px-4 text-[0.9375rem] text-ink outline-none transition-[border-color,box-shadow] placeholder:text-subtle focus:border-navy-soft focus:ring-4 focus:ring-navy-soft/10 ${
+    invalid ? 'border-danger' : 'border-line hover:border-ink/25'
+  }`;
+
+function Field({
+  label,
+  htmlFor,
+  error,
+  hint,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  error?: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="min-w-0">
+      <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-ink">
+        {label}
+      </label>
+      {children}
+      {hint && !error && <p className="mt-1.5 text-xs text-muted">{hint}</p>}
+      {error && (
+        <p className="mt-1.5 text-xs font-medium text-danger" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function Step({ index, title, description, children }: { index: number; title: string; description?: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-card border border-line bg-white p-5 sm:p-8">
+      <div className="mb-6 flex items-start gap-4">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-sm font-semibold text-white">
+          {index}
+        </span>
+        <div>
+          <h2 className="text-xl font-semibold text-ink">{title}</h2>
+          {description && <p className="mt-1 text-sm text-muted">{description}</p>}
+        </div>
+      </div>
+      {children}
+    </section>
+  );
+}
+
 const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
   heading,
   showOption,
   showPersonalDetails = true,
-//   offeredCurrencies,
   showCart,
   defaultCurrency = 'EUR',
-  isHomePage = false 
+  isHomePage = false,
 }) => {
-  // const [selectedOption, setSelectedOption] = useState<'buy' | 'sell'>('buy');
-   const options = [
-    { value: 'buy', label: 'Click and Buy' },
-    { value: 'sell', label: 'Click and Sell' },
-  ].filter(opt => {
-    if (showOption === 'both') return true; // Show both options
-    if (showOption === 'buy') return opt.value === 'buy'; // Show only buy
-    if (showOption === 'sell') return opt.value === 'sell'; // Show only sell
+  const options = [
+    { value: 'buy', label: 'Buy currency' },
+    { value: 'sell', label: 'Sell currency' },
+  ].filter((opt) => {
+    if (showOption === 'both') return true;
+    if (showOption === 'buy') return opt.value === 'buy';
+    if (showOption === 'sell') return opt.value === 'sell';
     return true;
-  }); 
+  });
 
-  const sendOrderMutation = useOrderEmail()
+  const sendOrderMutation = useOrderEmail();
   const titleOptions = ['Mr.', 'Mrs.', 'Ms.'];
   const branchOptions = ['Grays Branch 54-56 High Street RM17 6NA'];
   const paymentMethodOptions = ['Pay on branch (cash)'];
-  const [selectedOption, setSelectedOption] = useState<'buy' | 'sell'>(() => {
-    // If showOption is 'sell', default to 'sell'
-    if (showOption === 'sell') {
-      return 'sell';
-    }
-    // If showOption is 'buy', default to 'buy'
-    if (showOption === 'buy') {
-      return 'buy';
-    }
-    // For 'both' or any other case, default to 'buy'
-    return 'buy';
-  });
+  const [selectedOption, setSelectedOption] = useState<'buy' | 'sell'>(() => (showOption === 'sell' ? 'sell' : 'buy'));
   const [buyCartItems, setBuyCartItems] = useState<CartItem[]>([]);
   const [sellCartItems, setSellCartItems] = useState<CartItem[]>([]);
-  // Current cart items based on selected option
   const currentCartItems = selectedOption === 'buy' ? buyCartItems : sellCartItems;
-  // const [cartItems, setCartItems] = React.useState<CartItem[]>([]);
   const [selectedCurrency, setSelectedCurrency] = React.useState(defaultCurrency);
   const [gbpAmount, setGbpAmount] = React.useState('');
   const [foreignAmount, setForeignAmount] = React.useState('');
+  const [calcError, setCalcError] = useState('');
   const successMessageRef = useRef<HTMLDivElement>(null);
   const [customer_title, setTitle] = React.useState('Mr.');
   const [first_name, set_first_name] = React.useState('');
@@ -76,117 +114,44 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
   const [paymentMethod, setPaymentMethod] = React.useState('');
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isOrderSuccess, setIsOrderSuccess] = useState(false);
-  const router = useRouter(); 
-  const { data: exchangeRates, isLoading, error, refetch } = useCurrencyRates();
- 
-     const getCurrentRate = () => {
-       if (!exchangeRates || exchangeRates.length === 0) {
-         return selectedOption === 'buy' ? 1.12 : 1.08;
-       }
-      const rateData = exchangeRates.find(r => r.currency_code === selectedCurrency);
-      if (!rateData) return selectedOption === 'buy' ? 1.12 : 1.08;
-      return selectedOption === 'buy' ? rateData.sell_rate : rateData.buy_rate;
-  };
+  const router = useRouter();
+  const { data: exchangeRates, isLoading, error } = useCurrencyRates();
 
- const [rate, setRate] = React.useState(1.12);
-
- useEffect(() => {
-  const loadCart = () => {
-    if (typeof window !== 'undefined') {
-      try {
-        // ALWAYS check for buy cart
-        const savedBuyCart = localStorage.getItem('buyCurrencyCart');
-        // console.log('Buy cart from localStorage:', savedBuyCart);
-        
-        if (savedBuyCart) {
-          const parsedBuyCart = JSON.parse(savedBuyCart);
-          // console.log('Parsed buy cart:', parsedBuyCart);
-          setBuyCartItems(parsedBuyCart);
-        } else {
-          // console.log('No buy cart found in localStorage');
-          setBuyCartItems([]); // Ensure it's empty if not found
-        }
-        
-        // ALWAYS check for sell cart
-        const savedSellCart = localStorage.getItem('sellCurrencyCart');
-        // console.log('Sell cart from localStorage:', savedSellCart);
-        
-        if (savedSellCart) {
-          const parsedSellCart = JSON.parse(savedSellCart);
-          // console.log('Parsed sell cart:', parsedSellCart);
-          setSellCartItems(parsedSellCart);
-        } else {
-          // console.log('No sell cart found in localStorage');
-          setSellCartItems([]); // Ensure it's empty if not found
-        }
-        
-      } catch (error) {
-        console.error('Error parsing carts from localStorage:', error);
-        // Clear all cart storage on error
-        localStorage.removeItem('buyCurrencyCart');
-        localStorage.removeItem('sellCurrencyCart');
-        // Don't remove old key here - it might still be needed for migration elsewhere
-      }
+  const getCurrentRate = () => {
+    if (!exchangeRates || exchangeRates.length === 0) {
+      return selectedOption === 'buy' ? 1.12 : 1.08;
     }
+    const rateData = exchangeRates.find((r) => r.currency_code === selectedCurrency);
+    if (!rateData) return selectedOption === 'buy' ? 1.12 : 1.08;
+    return selectedOption === 'buy' ? rateData.sell_rate : rateData.buy_rate;
   };
-  
-  // Load immediately on mount
-  // console.log('Loading cart on component mount...');
-  loadCart();
-  
-  // Also listen for storage events
-  window.addEventListener('storage', loadCart);
-  return () => window.removeEventListener('storage', loadCart);
-}, []); // Empty dependency array - run only once on mount
-  //   useEffect(() => {
-  //   const loadCart = () => {
-  //     if (typeof window !== 'undefined') {
-  //       // const savedCart = localStorage.getItem('currencyCart');
-  //       // if (savedCart) {
-  //         try {
-  //           // const parsedCart = JSON.parse(savedCart);
-  //           // setCartItems(parsedCart);
-  //           const savedBuyCart = localStorage.getItem('buyCurrencyCart');
-  //         const savedSellCart = localStorage.getItem('sellCurrencyCart');
-          
-  //         if (savedBuyCart) {
-  //           const parsedBuyCart = JSON.parse(savedBuyCart);
-  //           setBuyCartItems(parsedBuyCart);
-  //         }
-          
-  //         if (savedSellCart) {
-  //           const parsedSellCart = JSON.parse(savedSellCart);
-  //           setSellCartItems(parsedSellCart);
-  //         }
-  //         } catch (error) {
-  //           console.error('Error parsing cart from localStorage:', error);
-  //           // localStorage.removeItem('currencyCart');
-  //           localStorage.removeItem('buyCurrencyCart');
-  //           localStorage.removeItem('sellCurrencyCart');
-  //         }
-        
-  //     }
-  //   };
-    
-  //   loadCart();
-    
-  //   // Also listen for storage events (if cart is updated from another tab/window)
-  //   window.addEventListener('storage', loadCart);
-  //   return () => window.removeEventListener('storage', loadCart);
-  // }, []);
-  
+
+  const [rate, setRate] = React.useState(1.12);
+
+  useEffect(() => {
+    const loadCart = () => {
+      if (typeof window !== 'undefined') {
+        try {
+          const savedBuyCart = localStorage.getItem('buyCurrencyCart');
+          setBuyCartItems(savedBuyCart ? JSON.parse(savedBuyCart) : []);
+
+          const savedSellCart = localStorage.getItem('sellCurrencyCart');
+          setSellCartItems(savedSellCart ? JSON.parse(savedSellCart) : []);
+        } catch (error) {
+          console.error('Error parsing carts from localStorage:', error);
+          localStorage.removeItem('buyCurrencyCart');
+          localStorage.removeItem('sellCurrencyCart');
+        }
+      }
+    };
+
+    loadCart();
+    window.addEventListener('storage', loadCart);
+    return () => window.removeEventListener('storage', loadCart);
+  }, []);
+
   // Save cart items to localStorage whenever they change (but not on initial load)
   const isInitialMount = React.useRef(true);
-  // useEffect(() => {
-  //   if (isInitialMount.current) {
-  //     isInitialMount.current = false;
-  //     return;
-  //   }
-    
-  //   if (typeof window !== 'undefined') {
-  //     localStorage.setItem('currencyCart', JSON.stringify(cartItems));
-  //   }
-  // }, [cartItems]);
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -196,7 +161,7 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
       localStorage.setItem('buyCurrencyCart', JSON.stringify(buyCartItems));
     }
   }, [buyCartItems]);
-  
+
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -211,7 +176,7 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
     if (exchangeRates && exchangeRates.length > 0) {
       const newRate = getCurrentRate();
       setRate(newRate);
-      
+
       // Recalculate foreign amount if GBP amount exists
       if (gbpAmount && !isNaN(parseFloat(gbpAmount))) {
         const calculated = parseFloat(gbpAmount) * newRate;
@@ -220,12 +185,12 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
     }
   }, [selectedCurrency, selectedOption, exchangeRates]);
 
-
   const handleCurrencySelect = (currencyCode: string) => {
     setSelectedCurrency(currencyCode);
   };
 
   const handleGbpChange = (value: string) => {
+    setCalcError('');
     setGbpAmount(value);
     if (value && !isNaN(parseFloat(value))) {
       const calculated = parseFloat(value) * rate;
@@ -236,6 +201,7 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
   };
 
   const handleForeignChange = (value: string) => {
+    setCalcError('');
     setForeignAmount(value);
     if (value && !isNaN(parseFloat(value))) {
       const calculated = parseFloat(value) / rate;
@@ -244,29 +210,25 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
       setGbpAmount('');
     }
   };
-  //Add to Cart
+
+  // Add to cart
   const handleAddToCart = () => {
     if (!gbpAmount || parseFloat(gbpAmount) <= 0) {
-      alert('Please enter a valid GBP amount');
+      setCalcError('Enter an amount to continue.');
       return;
     }
 
     if (!selectedCurrency) {
-      alert('Please select a currency');
+      setCalcError('Choose a currency to continue.');
       return;
     }
-    if (!exchangeRates)
-      return;
+    if (!exchangeRates) return;
 
-    // const selectedCurrencyData = exchangeRates.find(r => r.code === selectedCurrency);
-    const selectedCurrencyData = exchangeRates.find(r => r.currency_code === selectedCurrency);
+    const selectedCurrencyData = exchangeRates.find((r) => r.currency_code === selectedCurrency);
     if (!selectedCurrencyData) return;
 
-    const countryCode = getFlagCountryCode(
-      selectedCurrencyData.currency_code,
-      selectedCurrencyData.country_name
-    );
-    
+    const countryCode = getFlagCountryCode(selectedCurrencyData.currency_code, selectedCurrencyData.country_name);
+
     const newItem: CartItem = {
       id: Date.now().toString(),
       fromCurrency: {
@@ -274,7 +236,7 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
         name: 'United Kingdom',
         country: 'gb',
         flag: 'gb',
-        amount: parseFloat(gbpAmount).toFixed(2)
+        amount: parseFloat(gbpAmount).toFixed(2),
       },
       toCurrency: {
         code: selectedCurrencyData.currency_code,
@@ -282,16 +244,15 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
         country: countryCode,
         countryName: selectedCurrencyData.country_name,
         flag: countryCode,
-        amount: foreignAmount
+        amount: foreignAmount,
       },
       transactionType: selectedOption,
       rate: getCurrentRate(),
-      type: 'collect'
+      type: 'collect',
     };
-    // console.log('Adding item with transactionType:', selectedOption); 
+
     if (isHomePage) {
-    // Get existing cart from localStorage
-    if (selectedOption === 'buy') {
+      if (selectedOption === 'buy') {
         const existingBuyCart = JSON.parse(localStorage.getItem('buyCurrencyCart') || '[]');
         existingBuyCart.push(newItem);
         localStorage.setItem('buyCurrencyCart', JSON.stringify(existingBuyCart));
@@ -302,191 +263,127 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
         localStorage.setItem('sellCurrencyCart', JSON.stringify(existingSellCart));
         router.push('/click-and-sell-currency');
       }
-    // const existingCart = JSON.parse(localStorage.getItem('currencyCart') || '[]');
-    // existingCart.push(newItem);
-    // localStorage.setItem('currencyCart', JSON.stringify(existingCart));
-    
-    // // Redirect
-    // router.push(selectedOption === 'buy' ? '/click-and-buy-currency' : '/click-and-sell-currency');
-    return;
-  }
-    // setCartItems(prev => [...prev, newItem]);
-    if (selectedOption === 'buy') {
-      setBuyCartItems(prev => [...prev, newItem]);
-    } else {
-      setSellCartItems(prev => [...prev, newItem]);
+      return;
     }
-    
+
+    if (selectedOption === 'buy') {
+      setBuyCartItems((prev) => [...prev, newItem]);
+    } else {
+      setSellCartItems((prev) => [...prev, newItem]);
+    }
+
     setGbpAmount('');
     setForeignAmount('');
+    if (formErrors.cart) {
+      setFormErrors((prev) => {
+        const next = { ...prev };
+        delete next.cart;
+        return next;
+      });
+    }
   };
 
-  // Remove from cart function
   const handleRemoveFromCart = (id: string, transactionType?: 'buy' | 'sell') => {
     const typeToRemove = transactionType || selectedOption;
     if (typeToRemove === 'buy') {
-      setBuyCartItems(prev => {
-        const updatedCart = prev.filter(item => item.id !== id);
-        return updatedCart;
-      });
+      setBuyCartItems((prev) => prev.filter((item) => item.id !== id));
     } else {
-      setSellCartItems(prev => {
-        const updatedCart = prev.filter(item => item.id !== id);
-        return updatedCart;
-      });
+      setSellCartItems((prev) => prev.filter((item) => item.id !== id));
     }
-    // setCartItems(prev => {
-    //   const updatedCart = prev.filter(item => item.id !== id);
-    //   // Update localStorage immediately when removing
-    //   if (typeof window !== 'undefined') {
-    //     localStorage.setItem('currencyCart', JSON.stringify(updatedCart));
-    //   }
-    //   return updatedCart;
-    // });
   };
 
   const filteredCartItems = useMemo(() => {
     if (showOption === 'both') {
-      // return cartItems;
       return [...buyCartItems, ...sellCartItems];
     }
-    return currentCartItems
+    return currentCartItems;
   }, [buyCartItems, sellCartItems, currentCartItems, showOption]);
 
   const formattedExchangeRates = useMemo(() => {
     if (!exchangeRates) return [];
-    return exchangeRates.map(rate => ({
+    return exchangeRates.map((rate) => ({
       currency: rate.currency_name,
       code: rate.currency_code,
       country: getFlagCountryCode(rate.currency_code, rate.country_name),
       countryName: rate.country_name,
       buyRate: rate.buy_rate,
-      sellRate: rate.sell_rate
+      sellRate: rate.sell_rate,
     }));
   }, [exchangeRates]);
 
-  const selectedCurrencyData = exchangeRates?.find(r => r.currency_code === selectedCurrency);
+  const selectedCurrencyData = exchangeRates?.find((r) => r.currency_code === selectedCurrency);
+  const foreignCode = selectedCurrencyData?.currency_code || selectedCurrency;
+  const foreignFlag = getFlagCountryCode(foreignCode, selectedCurrencyData?.country_name);
 
   const validateField = (field: string, value: string) => {
-  const newErrors = { ...formErrors };
-  
-  switch (field) {
-    case 'email':
-      if (!value) {
-        newErrors.email = 'Email is required';
-      } else {
-        delete newErrors.email;
-      }
-      break;
-      
-    case 'mobile':
-      if (!value) {
-        newErrors.mobile = 'Mobile number is required';
-      } else {
-        delete newErrors.mobile;
-      }
-      break;
-      
-    case 'first_name':
-      if (!value) {
-        newErrors.first_name = 'First name is required';
-      } else {
-        delete newErrors.first_name;
-      }
-      break;
-      
-    case 'last_name':
-      if (!value) {
-        newErrors.last_name = 'Last name is required';
-      } else {
-        delete newErrors.last_name;
-      }
-      break;
-      
-    case 'branch_name':
-      if (!value) {
-        newErrors.branch_name = 'Please select a branch';
-      } else {
-        delete newErrors.branch_name;
-      }
-      break;
-      
-    case 'paymentMethod':
-      if (!value) {
-        newErrors.paymentMethod = 'Please select a payment method';
-      } else {
-        delete newErrors.paymentMethod;
-      }
-      break;
-  }
-  
-  setFormErrors(newErrors);
-};
-const handleSubmitOrder = async () => {
-  setFormErrors({});
-  const newErrors: Record<string, string> = {};
-  // Validation
-  const allCartItems = showOption === 'both' 
-      ? [...buyCartItems, ...sellCartItems]
-      : currentCartItems;
-  if (!termsAccepted) {
-    newErrors.terms = 'Please accept the Terms and Conditions';
-  }
-  // Personal details validation (only if showPersonalDetails is true)
-  if (showPersonalDetails) {
-    if (!first_name) newErrors.first_name = 'First name is required';
-    if (!last_name) newErrors.last_name = 'Last name is required';
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } 
-    
-    if (!mobile) {
-      newErrors.mobile = 'Mobile number is required';
-    } else if (!/^[\+]?[0-9\s\-\(\)]+$/.test(mobile)) {
-      newErrors.mobile = 'Please enter a valid mobile number';
-    }
-    
-    if (!branch_name) newErrors.branch_name = 'Please select a branch';
-    if (!paymentMethod) newErrors.paymentMethod = 'Please select a payment method';
-  }
+    const newErrors = { ...formErrors };
 
-  if (allCartItems.length === 0) {
-      newErrors.cart = 'Your cart is empty. Please add items first.';
+    switch (field) {
+      case 'email':
+        if (!value) newErrors.email = 'Email is required';
+        else delete newErrors.email;
+        break;
+      case 'mobile':
+        if (!value) newErrors.mobile = 'Mobile number is required';
+        else delete newErrors.mobile;
+        break;
+      case 'first_name':
+        if (!value) newErrors.first_name = 'First name is required';
+        else delete newErrors.first_name;
+        break;
+      case 'last_name':
+        if (!value) newErrors.last_name = 'Last name is required';
+        else delete newErrors.last_name;
+        break;
+      case 'branch_name':
+        if (!value) newErrors.branch_name = 'Please select a branch';
+        else delete newErrors.branch_name;
+        break;
+      case 'paymentMethod':
+        if (!value) newErrors.paymentMethod = 'Please select a payment method';
+        else delete newErrors.paymentMethod;
+        break;
     }
 
-  // If there are errors, set them and stop submission
-  if (Object.keys(newErrors).length > 0) {
     setFormErrors(newErrors);
-    
-    // Scroll to first error
-    const firstErrorKey = Object.keys(newErrors)[0];
-    const element = document.getElementById(firstErrorKey);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    
-    return;
-  }
-  // Use the first cart item (or loop through all if multiple)
-  // const cartItem = cartItems[0]
-  
-  // Find currency data
-  // const selectedCurrencyData = exchangeRates?.find(
-  //   r => r.currency_code === cartItem.toCurrency.code
-  // )
+  };
 
-  // if (!selectedCurrencyData) {
-  //   alert('Currency data not found')
-  //   return
-  // }
-  // const orderItems = cartItems.map(cartItem => {
-  //     const selectedCurrencyData = exchangeRates?.find(
-  //       r => r.currency_code === cartItem.toCurrency.code
-  //     );
-  const orderItems = allCartItems.map(cartItem => {
-      const selectedCurrencyData = exchangeRates?.find(
-        r => r.currency_code === cartItem.toCurrency.code
-      );
+  const handleSubmitOrder = async () => {
+    setFormErrors({});
+    const newErrors: Record<string, string> = {};
+    const allCartItems = showOption === 'both' ? [...buyCartItems, ...sellCartItems] : currentCartItems;
+
+    if (allCartItems.length === 0) {
+      newErrors.cart = 'Your order is empty. Add a currency above first.';
+    }
+    if (showPersonalDetails) {
+      if (!first_name) newErrors.first_name = 'First name is required';
+      if (!last_name) newErrors.last_name = 'Last name is required';
+      if (!email) newErrors.email = 'Email is required';
+      if (!mobile) {
+        newErrors.mobile = 'Mobile number is required';
+      } else if (!/^[\+]?[0-9\s\-\(\)]+$/.test(mobile)) {
+        newErrors.mobile = 'Please enter a valid mobile number';
+      }
+      if (!branch_name) newErrors.branch_name = 'Please select a branch';
+      if (!paymentMethod) newErrors.paymentMethod = 'Please select a payment method';
+    }
+    if (!termsAccepted) {
+      newErrors.terms = 'Please accept the Terms and Conditions';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setFormErrors(newErrors);
+      const firstErrorKey = Object.keys(newErrors)[0];
+      const element = document.getElementById(firstErrorKey === 'cart' ? 'order-step' : firstErrorKey);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
+    const orderItems = allCartItems.map((cartItem) => {
+      const selectedCurrencyData = exchangeRates?.find((r) => r.currency_code === cartItem.toCurrency.code);
 
       return {
         currency_name: selectedCurrencyData?.currency_name || cartItem.toCurrency.code,
@@ -494,373 +391,514 @@ const handleSubmitOrder = async () => {
         transaction_type: cartItem.transactionType,
         gbp_amount: parseFloat(cartItem.fromCurrency.amount),
         foreign_amount: parseFloat(cartItem.toCurrency.amount),
-        exchange_rate: cartItem.rate
+        exchange_rate: cartItem.rate,
       };
     });
 
-  // Prepare order data
-  const orderData = {
-    customer_title,
-    first_name,
-    last_name,
-    email,
-    mobile,
-    branch_name,
-    notes,
-    items:orderItems,
-    payment_method:paymentMethod
-  }
+    const orderData = {
+      customer_title,
+      first_name,
+      last_name,
+      email,
+      mobile,
+      branch_name,
+      notes,
+      items: orderItems,
+      payment_method: paymentMethod,
+    };
 
-  try {
-    const result = await sendOrderMutation.mutateAsync(orderData)
-    
-    if (result.success) {
-      // localStorage.removeItem('currencyCart')
-      if (selectedOption === 'buy') {
-          // Clear only buy cart
+    try {
+      const result = await sendOrderMutation.mutateAsync(orderData);
+
+      if (result.success) {
+        if (selectedOption === 'buy') {
           localStorage.removeItem('buyCurrencyCart');
           setBuyCartItems([]);
         } else {
-          // Clear only sell cart
           localStorage.removeItem('sellCurrencyCart');
           setSellCartItems([]);
         }
-      // setCartItems([])
-      // Reset form
-      setGbpAmount('')
-      setForeignAmount('')
-      set_first_name('')
-      set_last_name('')
-      setEmail('')
-      setMobile('')
-      setNotes('')
-      setTermsAccepted(false)
-      setFormErrors({})
-      setIsOrderSuccess(true);
-      setTimeout(() => {
-        if (successMessageRef.current) {
-          successMessageRef.current.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'center' 
-          });
-        }
-      }, 100);
-      setTimeout(() => {
-        setIsOrderSuccess(false);
-      }, 10000);
-    } else {
-      setFormErrors({ submit: 'Failed to send order confirmation. Please try again.' });
+        setGbpAmount('');
+        setForeignAmount('');
+        set_first_name('');
+        set_last_name('');
+        setEmail('');
+        setMobile('');
+        setNotes('');
+        setTermsAccepted(false);
+        setFormErrors({});
+        setIsOrderSuccess(true);
+        setTimeout(() => {
+          successMessageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+        setTimeout(() => {
+          setIsOrderSuccess(false);
+        }, 10000);
+      } else {
+        setFormErrors({ submit: 'Failed to send order confirmation. Please try again.' });
+      }
+    } catch (error: any) {
+      setFormErrors({ submit: `Error: ${error.message || 'Failed to submit order'}` });
     }
-  } catch (error: any) {
-    setFormErrors({ submit: `Error: ${error.message || 'Failed to submit order'}` });
-  }
-}
+  };
 
+  // ---------------------------------------------------------------
+  // Calculator (shared by the home page card and the order pages)
+  // ---------------------------------------------------------------
+  const isBuy = selectedOption === 'buy';
+  const topCode = isBuy ? 'GBP' : foreignCode;
+  const topFlag = isBuy ? 'gb' : foreignFlag;
+  const bottomCode = isBuy ? foreignCode : 'GBP';
+  const bottomFlag = isBuy ? foreignFlag : 'gb';
+
+  const amountBox = (
+    label: string,
+    code: string,
+    flag: string,
+    value: string,
+    onChange: (value: string) => void,
+    id: string
+  ) => (
+    <div
+      className={`rounded-xl border bg-white px-4 py-3 transition-[border-color,box-shadow] focus-within:border-navy-soft focus-within:ring-4 focus-within:ring-navy-soft/10 ${
+        calcError ? 'border-danger' : 'border-line'
+      }`}
+    >
+      <label htmlFor={id} className="block text-xs font-medium text-muted">
+        {label}
+      </label>
+      <div className="mt-1 flex items-center gap-3">
+        <input
+          id={id}
+          type="number"
+          inputMode="decimal"
+          min="0"
+          step="0.01"
+          placeholder="0.00"
+          className="tabular w-full min-w-0 bg-transparent text-2xl font-semibold text-ink outline-none placeholder:text-line"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+        <span className="flex shrink-0 items-center gap-2 rounded-full bg-canvas px-3 py-1.5 text-sm font-semibold text-ink">
+          <span className={`flag-icon flag-icon-${flag} rounded-[3px]`} aria-hidden="true" />
+          {code}
+        </span>
+      </div>
+    </div>
+  );
+
+  const calculator = (
+    <div className="space-y-4">
+      {options.length > 1 && (
+        <div className="grid grid-cols-2 rounded-full bg-canvas p-1" role="tablist" aria-label="Transaction type">
+          {options.map((opt) => {
+            const active = selectedOption === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setSelectedOption(opt.value as 'buy' | 'sell')}
+                className={`h-10 cursor-pointer rounded-full text-sm font-medium transition-all ${
+                  active ? 'bg-white text-ink shadow-card' : 'text-muted hover:text-ink'
+                }`}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      <div>
+        <label htmlFor="currency" className="mb-1.5 block text-xs font-medium text-muted">
+          Currency
+        </label>
+        {isLoading ? (
+          <div className="h-12 animate-pulse rounded-xl bg-canvas" />
+        ) : error ? (
+          <div className="flex h-12 items-center rounded-xl border border-danger/30 bg-danger/5 px-4 text-sm text-danger">
+            Rates are unavailable right now. Please try again shortly.
+          </div>
+        ) : (
+          <CurrencySelect id="currency" value={selectedCurrency} onChange={handleCurrencySelect} options={formattedExchangeRates} />
+        )}
+      </div>
+
+      <div className={isHomePage ? 'space-y-2' : 'grid gap-2 sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-3'}>
+        {amountBox(
+          isBuy ? 'You pay' : 'You sell',
+          topCode,
+          topFlag,
+          isBuy ? gbpAmount : foreignAmount,
+          isBuy ? handleGbpChange : handleForeignChange,
+          'amount-from'
+        )}
+
+        <div className="flex items-center gap-3 px-1 sm:justify-center">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full border border-line bg-white text-muted">
+            <ArrowDownUp className="h-4 w-4 sm:rotate-90" aria-hidden="true" />
+          </span>
+          {isHomePage && (
+            <span className="text-sm text-muted">
+              {isLoading ? (
+                <span className="inline-block h-4 w-32 animate-pulse rounded bg-canvas align-middle" />
+              ) : (
+                <>
+                  <span className="tabular font-medium text-ink">£1 = {rate.toFixed(4)} {foreignCode}</span>
+                  <span className="text-subtle"> · 0% commission</span>
+                </>
+              )}
+            </span>
+          )}
+        </div>
+
+        {amountBox(
+          'You receive',
+          bottomCode,
+          bottomFlag,
+          isBuy ? foreignAmount : gbpAmount,
+          isBuy ? handleForeignChange : handleGbpChange,
+          'amount-to'
+        )}
+      </div>
+
+      {!isHomePage && (
+        <p className="text-sm text-muted">
+          {isLoading ? (
+            <span className="inline-block h-4 w-40 animate-pulse rounded bg-canvas align-middle" />
+          ) : (
+            <>
+              Rate <span className="tabular font-medium text-ink">£1 = {rate.toFixed(4)} {foreignCode}</span>
+              <span className="text-subtle"> · 0% commission</span>
+            </>
+          )}
+        </p>
+      )}
+
+      {calcError && (
+        <p className="text-sm font-medium text-danger" role="alert">
+          {calcError}
+        </p>
+      )}
+
+      <button
+        type="button"
+        onClick={handleAddToCart}
+        disabled={isLoading || !!error}
+        className={`flex h-12 w-full cursor-pointer items-center justify-center rounded-full text-[0.9375rem] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+          isHomePage ? 'bg-gold text-ink hover:bg-gold-deep' : 'bg-navy text-white hover:bg-navy-soft'
+        }`}
+      >
+        {isHomePage ? 'Order now' : 'Add to order'}
+      </button>
+    </div>
+  );
+
+  // ---------------------------------------------------------------
+  // Home page: calculator card only
+  // ---------------------------------------------------------------
+  if (!showPersonalDetails) {
+    return (
+      <div className="rounded-card border border-line bg-white p-5 shadow-float sm:p-7">
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <h2 className="text-lg font-semibold text-ink">{heading}</h2>
+          <span className="flex items-center gap-2 text-xs font-medium text-muted">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-positive opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-positive" />
+            </span>
+            Today&apos;s rates
+          </span>
+        </div>
+        {calculator}
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------------
+  // Order pages: step-by-step checkout with a summary sidebar
+  // ---------------------------------------------------------------
+  const totalGbp = filteredCartItems.reduce((sum, item) => sum + parseFloat(item.fromCurrency.amount), 0);
+  let step = 0;
 
   return (
-    <div className="w-full relative mx-auto ">
-       
-      {/* 80% width box */}     
-      <div className=" w-[95%] sm:w-[90%] 2xl:w-[70%] p-4 pt-4 pb-6 md:p-5 lg:px-6 lg:pt-5 lg:pb-3 absolute top-[-120px] left-1/2 transform -translate-x-1/2 z-20 mx-auto bg-white shadow-equal-sm" style={{borderRadius:'50px'}}>
-        {/* Heading */}
-        <h2 className="text-xl sm:text-3xl font-bold text-black text-center mb-5 md:mb-8">{heading}</h2>          
-           <div className="flex flex-col flex-wrap sm:flex-row justify-center gap-2 md:gap-3 md:mb-4 lg:mb-6">
-        {/* Buy/Sell Option Select */}
-        <div className="p-2 flex font-medium border h-9.5 bg-grayblue-l">
-          <Image
-          height={10}
-          width={20}
-          src='/images/location.png'
-          alt='Buy or sell currency now'
-          className='w-auto h-5'/>
-          <CustomSelect
-            value={selectedOption}
-            onChange={(value) => setSelectedOption(value as 'buy' | 'sell')}
-            options={options}
-            buttonstyling='text-xs sm:text-sm'
-            className='w-full sm:w-50 md:w-30 text-xs sm:text-sm'
-          />
-        </div>
+    <section className="section pt-10 sm:pt-14">
+      <div className="container-page grid gap-8 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-10">
+        <div className="min-w-0 space-y-6">
+          <Step index={++step} title={heading} description="Choose a currency and enter either amount — we'll calculate the other.">
+            {calculator}
+          </Step>
 
-        {/* Currency Select with Flag */}
-        {isLoading ? (  
-            <div className="animate-pulse h-9.5 w-full sm:w-12 bg-gray-200 rounded"></div>
-          ) : error ? (
-            <div className="flex w-full sm:w-auto h-9.5 items-center border bg-grayblue-l px-2 overflow-hidden justify-center">
-              <span className="text-xs text-red-500">Error </span>
+          {showCart && (
+            <div id="order-step">
+              <Step index={++step} title="Your order" description="Add as many currencies as you need.">
+                {filteredCartItems.length > 0 ? (
+                  <CurrencyCart items={filteredCartItems} onRemoveItem={handleRemoveFromCart} />
+                ) : (
+                  <div
+                    className={`rounded-xl border border-dashed px-4 py-8 text-center text-sm ${
+                      formErrors.cart ? 'border-danger text-danger' : 'border-line text-muted'
+                    }`}
+                  >
+                    {formErrors.cart || 'No currencies added yet.'}
+                  </div>
+                )}
+              </Step>
             </div>
-          ) : (
-            <CurrencySelect
-              value={selectedCurrency}
-              onChange={handleCurrencySelect}
-              options={formattedExchangeRates}
-            />
           )}
 
-        {/* GBP Input */}
-        <div className="flex w-full sm:w-auto gap-1 sm:gap-3">
-            <div className="flex w-full md:w-35 h-9.5 items-center border bg-grayblue-l overflow-hidden">
-            <p className="pl-2 py-1 text-xs sm:text-sm text-black font-medium">
-                {selectedOption === 'buy' ? 'GBP' : (selectedCurrencyData?.currency_code || selectedCurrency)}
-              </p>
-              <input
-                type="number"
-                placeholder="0.00"
-                className="p-1 text-xs sm:text-sm text-black w-full font-medium outline-none"
-                value={selectedOption === 'buy' ? gbpAmount : foreignAmount}
-                onChange={(e) => selectedOption === 'buy' ? handleGbpChange(e.target.value) : handleForeignChange(e.target.value)}
-              />
-            </div>
-
-        {/* Arrows & Rate */}
-        <div className='flex items-center gap-1'>
-            <ArrowRightLeft className="color-grayblue" size={33}/>
-        {/* Rate Display */}
-        <div className="text-start w-auto">
-            <span className="text-xs text-black sm:text-sm font-semibold mb-0 mr-2 leading-tight">Rate:</span>
-            {isLoading ? (
-                  <div className="animate-pulse h-4 w-12 bg-gray-200 rounded"></div>
-                ) : error ? (
-                  <span className="text-xs text-red-500">Error</span>
-                ) : (
-                  <p className="text-xs sm:text-sm text-black font-medium mb-0 font-bold leading-tight">
-                    {rate.toFixed(4)}
-                  </p>
-                )}
-        </div>
-        </div>
-
-            {/* Foreign Currency Input */}       
-            <div className="flex items-center h-9.5 bg-grayblue-l border w-full md:w-35 overflow-hidden">
-            <div className="pl-2 text-xs text-black sm:text-sm font-medium">
-                {selectedOption === 'buy' ? (selectedCurrencyData?.currency_code || selectedCurrency) : 'GBP'}
-              </div>
-              <input
-                type="number"
-                placeholder="0.00"
-                className="p-2 w-full outline-none text-black text-xs sm:text-sm font-medium"
-                value={selectedOption === 'buy' ? foreignAmount : gbpAmount}
-                onChange={(e) => selectedOption === 'buy' ? handleForeignChange(e.target.value) : handleGbpChange(e.target.value)}
-              />
-            </div>
-        </div>
-
-        {/* Order Now Button */}
-        <div className="text-center">
-            <button className="w-40 py-2 border border-yellow-600/50 bg-yellow-500/30 hover:bg-yellow-500 cursor-pointer text-sm text-black font-semibold  transition"
-            onClick={handleAddToCart}>
-            Order Now
-            </button>
-        </div>
-           </div>               
-      </div>
-       {/* Cart Component */}
-      <div className="relative z-10 pt-30 sm:pt-30 md:pt-28 lg:pt-25">
-    {/* Cart Section */}
-     {showCart && currentCartItems.length > 0 && (
-      <div className="pt-15 sm:pt-0 mb-5 px-3 sm:px-10 ">
-        <CurrencyCart 
-          items={filteredCartItems}
-          onRemoveItem={handleRemoveFromCart}
-        />
-      </div>
-    )}
-     </div>
-      
-        {/* Personal Details Section - Hidden if prop is false */}
-        {showPersonalDetails && (    
-          <div className="pt-10 sm:pt-5 px-3 sm:px-10">
-            <h3 className="text-xl sm:text-3xl font-bold mb-3">Your Personal Details</h3>
-             {isOrderSuccess && (
-             <div 
+          <Step index={++step} title="Your details" description="We'll email your confirmation and have your order ready to collect.">
+            {isOrderSuccess && (
+              <div
                 ref={successMessageRef}
-                className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg shadow-md animate-fade-in"
-                role="alert"
+                className="mb-6 flex gap-4 rounded-xl border border-positive/20 bg-positive/5 p-4 animate-fade-up"
+                role="status"
                 id="success-message"
               >
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className='text-green-500'/>
-                  </div>
+                <CheckCircle2 className="h-6 w-6 shrink-0 text-positive" aria-hidden="true" />
+                <div>
+                  <p className="font-semibold text-ink">Order confirmed</p>
+                  <p className="mt-1 text-sm text-muted">We&apos;ve sent you a confirmation email and will be in touch shortly.</p>
                 </div>
-                <div className="ml-4">
-                  <h3 className="text-md font-bold text-black mb-1">
-                        Order Confirmed!
-                  </h3>
-                  <div className="text-black text-sm">
-                    <p>
-                      We've sent a confirmation email. We will reach you out soon.
-                    </p>
-                  </div>
-                </div>
-              
               </div>
-            </div>)}
-            {/* Title and Name */}
-            <div className="flex flex-wrap gap-1 sm:gap-3 mb-3">
-              <CustomSelect
-              value={customer_title}
-              onChange={(e) => setTitle(e)}
-              options={titleOptions.map(t => ({ value: t, label: t }))}
-              buttonstyling='text-sm w-full px-2 py-1 text-sm h-10 border border-gray-400 bg-gray-100/70'
-              className='flex sm:flex-1'
-             />
-             <div className='flex-1'>
-              <input
-                type="text"
-                placeholder="First Name"
-                className={`w-full px-4 text-sm text-black! h-10 border ${formErrors.first_name ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
-                // className="flex-1 px-4 text-sm h-10 border border-gray-400 bg-gray-100/70"
-                value={first_name}
-                // onChange={(e) => set_first_name(e.target.value)}
-                onChange={(e) => {
-                  set_first_name(e.target.value);
-                  validateField('first_name', e.target.value);
-                }}
-              />
-              {formErrors.first_name && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.first_name}</p>
-              )}</div>
-              <div className='flex-1 '>
-              <input
-                type="text"
-                placeholder="Last Name"
-                className={`px-2 w-full text-sm h-10 border text-black! ${formErrors.last_name ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
-                value={last_name}
-                onChange={(e) => {set_last_name(e.target.value); validateField('last_name', e.target.value);}}
-              />
-              {formErrors.last_name && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.last_name}</p>
-              )}</div>
+            )}
+
+            <div className="grid gap-4 sm:grid-cols-[7rem_1fr_1fr]">
+              <Field label="Title" htmlFor="customer_title">
+                <CustomSelect
+                  id="customer_title"
+                  value={customer_title}
+                  onChange={(e) => setTitle(e)}
+                  options={titleOptions.map((t) => ({ value: t, label: t }))}
+                />
+              </Field>
+              <Field label="First name" htmlFor="first_name" error={formErrors.first_name}>
+                <input
+                  id="first_name"
+                  type="text"
+                  autoComplete="given-name"
+                  className={inputClass(!!formErrors.first_name)}
+                  value={first_name}
+                  onChange={(e) => {
+                    set_first_name(e.target.value);
+                    validateField('first_name', e.target.value);
+                  }}
+                />
+              </Field>
+              <Field label="Last name" htmlFor="last_name" error={formErrors.last_name}>
+                <input
+                  id="last_name"
+                  type="text"
+                  autoComplete="family-name"
+                  className={inputClass(!!formErrors.last_name)}
+                  value={last_name}
+                  onChange={(e) => {
+                    set_last_name(e.target.value);
+                    validateField('last_name', e.target.value);
+                  }}
+                />
+              </Field>
             </div>
 
-            {/* Email and Mobile */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-3 mb-4 sm:mb-2">
-              <div className='w-full sm:w-97'>
-              <input
-                type="email"
-                placeholder="Email Address"
-                className={`px-4 w-full text-sm h-10 border text-black! ${formErrors.email ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
-                value={email}
-                onChange={(e) => {setEmail(e.target.value); validateField('email', e.target.value);}}
-              />
-              {formErrors.email && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
-              )}
-              </div>
-              <div className='w-full sm:w-97'>
-              <input
-                type="tel"
-                placeholder="Mobile"
-                className={`px-4 w-full text-sm h-10 border text-black! ${formErrors.mobile ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
-                value={mobile}
-                onChange={(e) => {setMobile(e.target.value); validateField('mobile', e.target.value);}}
-              />
-              {formErrors.mobile && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.mobile}</p>
-              )}
-              </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Field label="Email address" htmlFor="email" error={formErrors.email}>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  className={inputClass(!!formErrors.email)}
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    validateField('email', e.target.value);
+                  }}
+                />
+              </Field>
+              <Field label="Mobile number" htmlFor="mobile" error={formErrors.mobile}>
+                <input
+                  id="mobile"
+                  type="tel"
+                  autoComplete="tel"
+                  className={inputClass(!!formErrors.mobile)}
+                  value={mobile}
+                  onChange={(e) => {
+                    setMobile(e.target.value);
+                    validateField('mobile', e.target.value);
+                  }}
+                />
+              </Field>
             </div>
 
-            {/* Collection Info */}
-            <div className="mb-3 sm:mb-6">
-              <p className="font-bold text-sm text-gray-900 dark:text-white/80 mb-2">
-                For collection, you can visit any time between Working Hours
-              </p>
-              <div>
-              <CustomSelect
-              value={branch_name}
-              onChange={(e) => {setBranch(e); validateField('branch_name', e);}}
-              options={branchOptions.map(t => ({ value: t, label: t }))}
-              buttonstyling={`w-full text-sm px-4 py-1 text-sm h-10 border  ${formErrors.branch_name ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
-              className='w-full '
-              placeholder='Select Branch'
-             />
-             {formErrors.branch_name && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.branch_name}</p>
-              )}
-             </div>
-             
-              <textarea
-                placeholder="Special Instructions"
-                className="w-full pl-5 pb-3 pr-4 py-2 text-sm border border-gray-400 bg-gray-100/70 text-black! mt-3"
-                rows={4}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-              />
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Field
+                label="Collection branch"
+                htmlFor="branch_name"
+                error={formErrors.branch_name}
+                hint="Collect any time during opening hours."
+              >
+                <CustomSelect
+                  id="branch_name"
+                  value={branch_name}
+                  onChange={(e) => {
+                    setBranch(e);
+                    validateField('branch_name', e);
+                  }}
+                  options={branchOptions.map((t) => ({ value: t, label: t }))}
+                  placeholder="Select branch"
+                  invalid={!!formErrors.branch_name}
+                />
+              </Field>
+              <Field label="Payment method" htmlFor="paymentMethod" error={formErrors.paymentMethod}>
+                <CustomSelect
+                  id="paymentMethod"
+                  value={paymentMethod}
+                  onChange={(e) => {
+                    setPaymentMethod(e);
+                    validateField('paymentMethod', e);
+                  }}
+                  options={paymentMethodOptions.map((t) => ({ value: t, label: t }))}
+                  placeholder="Select payment method"
+                  invalid={!!formErrors.paymentMethod}
+                />
+              </Field>
             </div>
 
-            {/* Mailing List Checkbox */}
-            <div className="mb-6">
+            <div className="mt-4">
+              <Field label="Special instructions (optional)" htmlFor="notes">
+                <textarea
+                  id="notes"
+                  rows={4}
+                  className={`${inputClass()} h-auto py-3`}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </Field>
+            </div>
+
+            <div className="mt-6 space-y-4 border-t border-line pt-6">
               <label className="flex cursor-pointer items-start gap-3">
                 <input
                   type="checkbox"
-                  className="mt-1"
+                  className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-navy"
                   checked={mailingList}
                   onChange={(e) => setMailingList(e.target.checked)}
                 />
-                <span className="text-gray-800 dark:text-white/80 text-sm">
-                  Never miss a travel money deal. Sign up to our mailing list to stay up to date. 
-                  If you would like more information on how we handle your data or on how to unsubscribe 
-                  from our mailing list, check our <a href='/terms-and-conditions' className='text-blue-500 hover:text-blue-700'>Terms and Conditions</a> and <a href='/privacy-policy' className='text-blue-500 hover:text-blue-700'>Privacy Policy</a>. 
-                  In order to send you email updates, we securely share your data with a third party 
-                  email software provider who we allow to place additional cookies on your device.
+                <span className="text-sm leading-relaxed text-muted">
+                  Never miss a travel money deal — sign up to our mailing list. To learn how we handle your data or how to
+                  unsubscribe, see our{' '}
+                  <Link href="/terms-and-conditions" className="font-medium text-ink underline underline-offset-2">
+                    Terms and Conditions
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/privacy-policy" className="font-medium text-ink underline underline-offset-2">
+                    Privacy Policy
+                  </Link>
+                  . To send you email updates, we securely share your data with a third-party email software provider who we
+                  allow to place additional cookies on your device.
                 </span>
               </label>
-            </div>
 
-            {/* Terms Reminder */}
-            <p className="text-gray-800 dark:text-white/80 text-sm mb-4">
-              Please visit branch with your valid photo identity proof. To know more read <a href='/terms-and-conditions' className='text-blue-500 hover:text-blue-700'>Terms and Conditions</a>
-            </p>
-
-            {/* Terms Checkbox */}
-            <div className="mb-4 sm:mb-6">
-              <label className="cursor-pointer flex items-center gap-3">
+              <label id="terms" className="flex cursor-pointer items-start gap-3">
                 <input
                   type="checkbox"
+                  className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer accent-navy"
                   checked={termsAccepted}
                   onChange={(e) => setTermsAccepted(e.target.checked)}
                 />
-                <span className='text-sm'>Yes, I have read Terms and Conditions</span>
+                <span className="text-sm leading-relaxed text-ink">
+                  I have read and accept the{' '}
+                  <Link href="/terms-and-conditions" className="font-medium underline underline-offset-2">
+                    Terms and Conditions
+                  </Link>
+                  .
+                </span>
               </label>
             </div>
 
-            {/* Payment Method */}
-             <CustomSelect
-              value={paymentMethod}
-              onChange={(e) => {setPaymentMethod(e); validateField('paymentMethod', e);}}
-              options={paymentMethodOptions.map(t => ({ value: t, label: t }))}
-              buttonstyling={`w-full text-sm px-4 py-1 text-sm h-10 border  ${formErrors.paymentMethod ? 'border-red-500' : 'border-gray-400'} bg-gray-100/70`}
-              className='w-full '
-              placeholder='Select Payment Method'
-             />
-             {formErrors.paymentMethod && (
-                <p className="text-red-500 text-xs mt-1">{formErrors.paymentMethod}</p>
-              )}
-            {/* Confirm Order Button */}
-            <button 
+            <div className="mt-6 flex items-start gap-3 rounded-xl bg-gold-tint px-4 py-3 text-sm text-ink">
+              <IdCard className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+              <p>Please bring valid photo ID when you visit the branch to collect your order.</p>
+            </div>
+
+            <button
+              type="button"
               onClick={handleSubmitOrder}
-              className="w-auto mt-4 bg-blue-950 text-white py-2 px-5 font-light hover:bg-blue-950/90 cursor-pointer transition disabled:bg-opacity-50 disabled:cursor-not-allowed"
-              disabled={!termsAccepted || sendOrderMutation.isPending }
+              className="mt-6 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-navy text-[0.9375rem] font-medium text-white transition-colors hover:bg-navy-soft disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={!termsAccepted || sendOrderMutation.isPending}
             >
               {sendOrderMutation.isPending ? (
-                <span className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Sending Order...
-                </span>
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" aria-hidden="true" />
+                  Sending order…
+                </>
               ) : (
-                'Confirm Order'
+                'Confirm order'
               )}
             </button>
-            {formErrors.cart && currentCartItems.length === 0 && (
-                <p className="pt-3 text-red-500 text-xs mt-1">{formErrors.cart}</p>
-              )}
+            {formErrors.submit && (
+              <p className="mt-3 text-sm font-medium text-danger" role="alert">
+                {formErrors.submit}
+              </p>
+            )}
+            {formErrors.cart && !showCart && (
+              <p className="mt-3 text-sm font-medium text-danger" role="alert">
+                {formErrors.cart}
+              </p>
+            )}
+          </Step>
+        </div>
+
+        {/* Summary */}
+        <aside className="lg:sticky lg:top-24 lg:self-start">
+          <div className="rounded-card border border-line bg-white p-6">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Order summary</h2>
+            <dl className="mt-4 space-y-3 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-muted">Currencies</dt>
+                <dd className="tabular font-medium text-ink">{filteredCartItems.length}</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-muted">Commission</dt>
+                <dd className="font-medium text-positive">£0.00</dd>
+              </div>
+              <div className="flex items-baseline justify-between border-t border-line pt-3">
+                <dt className="font-medium text-ink">Total (GBP)</dt>
+                <dd className="tabular text-2xl font-semibold text-ink">
+                  £{totalGbp.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </dd>
+              </div>
+            </dl>
           </div>
-        )}
-      
-    </div>
+
+          <div className="mt-4 rounded-card bg-canvas p-6">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Good to know</h2>
+            <ul className="mt-4 space-y-4 text-sm">
+              {[
+                { icon: MapPin, text: `${site.address.line1}, ${site.address.city} ${site.address.postcode}` },
+                { icon: Clock, text: `${site.hours.days}, ${site.hours.time}` },
+                { icon: Wallet, text: 'Pay in branch when you collect' },
+                { icon: IdCard, text: 'Bring valid photo ID' },
+                { icon: ShieldCheck, text: 'Your rate is confirmed by email' },
+              ].map(({ icon: Icon, text }) => (
+                <li key={text} className="flex gap-3 text-ink">
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
+                  {text}
+                </li>
+              ))}
+            </ul>
+            <a
+              href={site.phoneHref}
+              className="mt-6 flex items-center gap-2 border-t border-line pt-4 text-sm font-medium text-ink hover:text-navy-soft"
+            >
+              <Phone className="h-4 w-4" aria-hidden="true" />
+              Questions? <span className="tabular">{site.phone}</span>
+            </a>
+          </div>
+        </aside>
+      </div>
+    </section>
   );
 };
 

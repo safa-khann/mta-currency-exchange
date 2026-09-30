@@ -1,173 +1,213 @@
 "use client"
-import Image from "next/image";
-import CurrencyOrderForm from "../common/CurrencyOrderForm";
-import { useCurrencyRates } from "@/lib/hooks/useCurrency";
-import MoneyTransferComp from "../common/MoneyTransferComp";
-import GoogleReviews from "../common/GoogleReviews";
+import Link from 'next/link';
+import { ArrowRight, BadgePercent, HeartHandshake, ShieldCheck, Star, TrendingUp } from 'lucide-react';
+import CurrencyOrderForm from '../common/CurrencyOrderForm';
+import MoneyTransferComp from '../common/MoneyTransferComp';
+import GoogleReviews from '../common/GoogleReviews';
+import SectionHeading, { Eyebrow } from '../ui/SectionHeading';
+import { ButtonLink } from '../ui/Button';
+import ServiceGrid from '../sections/ServiceGrid';
+import HowItWorks from '../sections/HowItWorks';
+import VisitBand from '../sections/VisitBand';
+import { useCurrencyRates } from '@/lib/hooks/useCurrency';
+import { getFlagCountryCode } from '@/utils/flagMapping';
+import { site } from '@/lib/site';
+import { formatRate } from '@/lib/format';
+
+const displayCurrencies = ['USD', 'EUR', 'TRY', 'CAD'];
+
+const strengths = [
+  {
+    icon: TrendingUp,
+    title: 'Best rates of exchange',
+    body: 'Bank-beating rates on every major currency, updated regularly.',
+  },
+  {
+    icon: BadgePercent,
+    title: 'No commission or fees',
+    body: 'What you see is what you get — 0% commission on every exchange.',
+  },
+  {
+    icon: HeartHandshake,
+    title: 'Excellent service',
+    body: 'A dedicated account executive who puts your needs first.',
+  },
+];
 
 export default function LandingPage() {
-    const { data: exchangeRates, isLoading } = useCurrencyRates();
-    const displayCurrencies = ['CAD', 'USD', 'EUR', 'TRY'];
-  
-    const filteredRates = exchangeRates?.filter(rate => 
-        displayCurrencies.includes(rate.currency_code)
-    ) || [];
- return (
+  const { data: exchangeRates, isLoading } = useCurrencyRates();
+
+  const featuredRates = displayCurrencies
+    .map((code) => exchangeRates?.find((rate) => rate.currency_code === code))
+    .filter((rate): rate is NonNullable<typeof rate> => Boolean(rate));
+
+  return (
     <>
-     <CurrencyOrderForm
-      heading="Currency Converter"
-      showOption="both" 
-      showPersonalDetails={false}
-      defaultCurrency="USD"
-      showCart={false}
-      isHomePage={true}
-    />
-    <div className="mt-15 sm:mt-18 md:mt-15 lg:mt-4 px-2 lg:px-25 flex items-center justify-center">
-        <div className="grid grid-cols-1 md:grid-cols-3 md:gap-5 gap-10 mx-4 max-mx-auto">
-            <div className="bg-white relative rounded-3xl flex flex-col shadow-equal-md p-6 relative pt-12 pb-10 border border-gray-100">
-                <div className="absolute top-[-20px] left-1/2 transform -translate-x-1/2">
-                    <div className="bg-grayblue text-white py-4 rounded-full w-20 h-full flex items-center justify-center text-2xl">
-                        <Image
-                            src="/images/lp1.png"
-                        alt="Hero background"
-                        width={40}
-                        height={40}
-                        className=""
-                        priority
-                        />
-                    </div>
-                    
-                </div>
-                <div className="pt-9 flex flex-col flex-1 text-center">
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">Click & Buy</h3>
-                    <p className="text-black text-sm mb-8 leading-normal">
-                      Order currencies online. Collect and pay at your local currency store.
-                    </p>
-                    <a href="/click-and-buy-currency" className="text-sm w-40 mx-auto bg-blue-950 cursor-pointer mt-auto text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
-                        Order Now
-                    </a>
-                </div>
-                
-                <div className="bottom-[-1px] left-1/2 transform -translate-x-1/2 absolute w-30 text-center bg-blue-950 h-1"></div>
-            </div>
-            <div className="bg-white rounded-3xl flex flex-col flex-1 shadow-equal-md p-6 relative pt-12 pb-10 border border-gray-100">
-               <div className="absolute top-[-20px] left-1/2 transform -translate-x-1/2">
-                    <div className="bg-grayblue text-white py-6.5 rounded-full w-20 h-full flex items-center justify-center text-2xl">
-                        <Image
-                            src="/images/lp2.png"
-                        alt="Hero background"
-                        width={57}
-                        height={40}
-                        className=""
-                        priority
-                        />
-                    </div>
-                </div>
-                
-               <div className="pt-9 flex flex-col text-center">
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">Home Delivery</h3>
-                    <p className="text-black text-sm mb-8 leading-normal">
-                        Order currency online from the comfort of home and get it delivered to your doorstep.
-                    </p>
-                    <a href="/currency-home-delivery" className="text-sm w-40 mx-auto bg-blue-950 mt-auto cursor-pointer text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
-                        Order Now
-                    </a>
-                </div>
-                
-               
-                <div className="bottom-[-1px] left-1/2 transform -translate-x-1/2 absolute w-30 text-center bg-blue-950 h-1"></div>
-            </div>
-            
-            <div className="bg-white rounded-3xl shadow-equal-md p-6 flex flex-col relative pt-12 pb-10 border border-gray-100">
-               <div className="absolute top-[-20px] left-1/2 transform -translate-x-1/2">
-                    <div className="bg-grayblue text-white py-5.5 rounded-full w-20 h-full flex items-center justify-center text-2xl">
-                        <Image
-                            src="/images/lp31.png"
-                        alt="Hero background"
-                        width={50}
-                        height={40}
-                        className=""
-                        priority
-                        />
-                    </div>
-                </div>
-               <div className="pt-9 flex flex-col flex-1 text-center">
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">Click & Sell</h3>
-                    <p className="text-black text-sm mb-8 leading-normal">
-                        Sell your unused currency online to benefit from preferential rates.
-                    </p>
-                    <a href="/click-and-sell-currency" className="text-sm w-40 bg-blue-950 mx-auto mt-auto cursor-pointer text-white font-medium py-3 px-8 rounded-full hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1">
-                        Order Now
-                    </a>
-                </div>
-                 <div className="bottom-[-1px] left-1/2 transform -translate-x-1/2 absolute w-30 text-center bg-blue-950 h-1"></div>
-                </div>
-        </div>
-    </div>
-    {/* yellow section rates */}
-        <div className="bg-yellow-brand text-center mt-18 w-full px-4 pt-9 pb-12">
-            <h2 className="text-center text-xl sm:text-3xl font-bold text-black mb-14">Our Bank Beating Rates</h2>
-            {filteredRates.length > 0 && (
-                 <div  className="flex justify-around mb-13 max-w-4xl mx-auto">
-              {filteredRates.map(rate => (
-                <div key={rate.id} className="text-center">
-                <p className="text-xl sm:text-3xl font-bold text-black">{rate.sell_rate}</p>
-                <p className="text-xl font-medium text-black">{rate.currency_code}</p>
-                </div>
-              ))}
-               </div>
-            )}
-            <p className="text-center text-sm sm:text-xl text-black mb-10">Our goal is to offer our customers the best value for their money.</p>
-            <a href="/money-exchange/currency-exchange-rates" className="text-sm mx-auto cursor-pointer bg-blue-950 text-white font-medium py-3.5 px-8 rounded-full hover:opacity-90 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
-            >
-                View more rates
-            </a>
-        </div>
-        {/* Core strengths */}
-        <div className="bg-blue-100/35 dark:bg-gradient-to-b dark:from-blue-950/90 dark:to-black text-center w-full px-4 pt-10 pb-12">
-            <h2 className="text-center text-xl sm:text-3xl font-bold text-black dark:text-white/70 mb-10 sm:mb-12">Our Core Strengths</h2>
-            <div className="flex flex-wrap sm:flex-row md:flex-nowrap gap-8 sm:gap-6 md:gap-0 justify-center mb-7 sm:mb-10 max-w-5xl mx-auto">
-                <div className="text-center border-0 md:border-r px-2 sm:px-4 lg:px-10">
-                <Image
-                    src="/images/icon1.png"
-                    alt="Hero background"
-                    width={50}
-                    height={40}
-                    className="mx-auto mb-5"
-                    priority
-                        />
-                <p className="text-sm sm:text-md lg:text-xl font-medium sm:font-semibold text-black dark:text-white/80">Best Rates of Exchange</p>
-                </div>
-                <div className="text-center border-0 md:border-r px-2 sm:px-4 lg:px-10">
-                    <Image
-                    src="/images/icon2.png"
-                    alt="Hero background"
-                    width={50}
-                    height={40}
-                    className="mx-auto mb-5"
-                    priority
-                    />
-                <p className="text-sm sm:text-md lg:text-xl font-medium sm:font-semibold text-black dark:text-white/80">No Commission or Fees</p></div>
-                <div className="text-center px-2 sm:px-4 lg:px-10">
-                    <Image
-                    src="/images/icon3.png"
-                    alt="Hero background"
-                    width={49}
-                    height={30}
-                    className="mx-auto w-14 mb-4 sm:mb-5"
-                    priority
-                    />
-                <p className="text-sm sm:text-md lg:text-xl font-medium sm:font-semibold text-black dark:text-white/80">Excellent Service</p>
-                </div>
-            </div>
-            <p className="mx-auto text-justify text-sm sm:text-md lg:text-xl [text-align-last:center]
-            max-w-2xl text-black dark:text-white/80">"Experience the difference with MTA Currency Exchange. Unlike traditional high street shops and banks, we offer a tailored approach to currency exchange. With a dedicated account executive by your side, you'll enjoy a personalized service that prioritizes your needs and secures the best rates."
+      {/* Hero */}
+      <section className="relative overflow-hidden bg-canvas">
+        <div
+          className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_80%_80%_at_30%_0%,black,transparent)]"
+          aria-hidden="true"
+        />
+        <div className="pointer-events-none absolute -right-40 -top-40 h-[28rem] w-[28rem] rounded-full bg-gold/25 blur-3xl" aria-hidden="true" />
+        <div className="container-page relative grid gap-12 py-14 sm:py-20 lg:grid-cols-[1.1fr_1fr] lg:items-center lg:gap-16 lg:py-24">
+          <div className="animate-fade-up">
+            <Eyebrow>Foreign exchange in Grays</Eyebrow>
+            <h1 className="mt-5 text-[2.75rem] font-semibold leading-[1.02] text-ink sm:text-6xl lg:text-[4.25rem]">
+              Currency exchange beyond borders.
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
+              Bank-beating rates with 0% commission. Order online in minutes and collect from our Grays branch — or send money
+              worldwide with MoneyGram, Western Union and Ria.
             </p>
-           </div>
-           <MoneyTransferComp showAuth={true} showGlobalPartners={true} />
-           <GoogleReviews placeId="ChIJ29tg6ZK32EcRqVpTwhZEmRk"/>
-          
-         
+            <div className="mt-8 flex flex-wrap gap-3">
+              <ButtonLink href="/click-and-buy-currency" size="lg">
+                Buy currency
+              </ButtonLink>
+              <ButtonLink href="/click-and-sell-currency" variant="secondary" size="lg">
+                Sell currency
+              </ButtonLink>
+            </div>
+            <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm text-muted">
+              <li className="flex items-center gap-2">
+                <Star className="h-4 w-4 fill-gold text-gold" aria-hidden="true" />
+                <span>
+                  <span className="font-semibold text-ink">5.0</span> Google rating
+                </span>
+              </li>
+              <li className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-navy-soft" aria-hidden="true" />
+                Authorised by FCA &amp; HMRC
+              </li>
+              <li className="flex items-center gap-2">
+                <BadgePercent className="h-4 w-4 text-navy-soft" aria-hidden="true" />
+                0% commission
+              </li>
+            </ul>
+          </div>
+
+          <div className="animate-fade-up [animation-delay:120ms] lg:justify-self-end lg:w-full lg:max-w-md">
+            <CurrencyOrderForm
+              heading="Currency converter"
+              showOption="both"
+              showPersonalDetails={false}
+              defaultCurrency="USD"
+              showCart={false}
+              isHomePage={true}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Rates */}
+      <section className="bg-ink py-16 sm:py-20">
+        <div className="container-page">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <SectionHeading
+              tone="dark"
+              eyebrow="Today’s rates"
+              title="Our bank-beating rates"
+              description="Our goal is to offer our customers the best value for their money."
+            />
+            <Link
+              href="/money-exchange/currency-exchange-rates"
+              className="group inline-flex items-center gap-2 text-sm font-medium text-white"
+            >
+              View all rates
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+            </Link>
+          </div>
+
+          <ul className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-card bg-white/10 lg:grid-cols-4">
+            {(isLoading || featuredRates.length === 0 ? displayCurrencies : featuredRates).map((item) => {
+              if (typeof item === 'string') {
+                return (
+                  <li key={item} className="bg-ink p-6 sm:p-8">
+                    <div className="h-5 w-16 animate-pulse rounded bg-white/10" />
+                    <div className="mt-8 h-9 w-24 animate-pulse rounded bg-white/10" />
+                  </li>
+                );
+              }
+              return (
+                <li key={item.id} className="bg-ink p-6 sm:p-8">
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className={`flag-icon flag-icon-${getFlagCountryCode(item.currency_code, item.country_name)} rounded-[3px]`}
+                      aria-hidden="true"
+                    />
+                    <span className="font-semibold text-white">{item.currency_code}</span>
+                    <span className="hidden truncate text-sm text-white/50 sm:inline">{item.currency_name}</span>
+                  </div>
+                  <p className="tabular mt-8 text-3xl font-semibold text-white sm:text-4xl">{formatRate(item.sell_rate)}</p>
+                  <p className="mt-1 text-sm text-white/50">per £1</p>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+
+      {/* Services */}
+      <section className="section">
+        <div className="container-page">
+          <SectionHeading
+            eyebrow="Services"
+            title="Everything you need to move money"
+            description="Buy, sell and send — online or in branch, always at 0% commission."
+          />
+          <div className="mt-12">
+            <ServiceGrid only={['buy', 'sell', 'delivery', 'transfer']} />
+          </div>
+        </div>
+      </section>
+
+      <HowItWorks />
+
+      {/* Core strengths */}
+      <section className="section">
+        <div className="container-page grid gap-12 lg:grid-cols-2 lg:gap-20">
+          <div>
+            <SectionHeading eyebrow="Why MTA" title="Experience the difference" />
+            <p className="mt-6 text-lg leading-relaxed text-muted">
+              Unlike traditional high street shops and banks, we offer a tailored approach to currency exchange. With a dedicated
+              account executive by your side, you&apos;ll enjoy a personalised service that prioritises your needs and secures the
+              best rates.
+            </p>
+            <ButtonLink href="/about-mta" variant="secondary" className="mt-8">
+              More about MTA
+            </ButtonLink>
+          </div>
+          <ul className="divide-y divide-line border-y border-line">
+            {strengths.map(({ icon: Icon, title, body }) => (
+              <li key={title} className="flex gap-5 py-7">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-tint text-ink">
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <h3 className="text-lg font-semibold text-ink">{title}</h3>
+                  <p className="mt-1 text-[0.9375rem] leading-relaxed text-muted">{body}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Partners & regulation */}
+      <section className="border-y border-line py-12">
+        <div className="container-page">
+          <MoneyTransferComp showAuth={true} showGlobalPartners={true} />
+        </div>
+      </section>
+
+      {/* Reviews */}
+      <section className="section overflow-hidden">
+        <div className="container-page">
+          <GoogleReviews placeId={site.googlePlaceId} />
+        </div>
+      </section>
+
+      <VisitBand />
     </>
   );
 }

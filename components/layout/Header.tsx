@@ -1,15 +1,12 @@
 'use client'
-import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import {  
-  AlignJustify, 
-  X, 
-  ChevronRight,
-  ChevronDown, 
-} from 'lucide-react';
-import SocialLinks from '../common/SocialLinks';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ChevronDown, Menu, Phone, X, ArrowUpRight } from 'lucide-react';
+import Logo from '../ui/Logo';
+import { ButtonLink } from '../ui/Button';
+import SocialLinks from '../common/SocialLinks';
+import { nav, site } from '@/lib/site';
 
 export default function Header() {
   const pathname = usePathname();
@@ -17,37 +14,51 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const isHomeDeliveryPage = pathname === '/currency-home-delivery';
   const isAdminPage = pathname?.startsWith('/admin');
 
+  const isActive = (href: string) => pathname === href;
+  const isExchangeActive = nav.exchange.some((item) => isActive(item.href));
+
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 8);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu when clicking outside
+  // Close menus on navigation.
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
+    setIsDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+  }
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsDropdownOpen(false);
+        setIsMobileMenuOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
   }, []);
 
-  // Prevent body scroll when mobile menu is open
+  // Prevent body scroll while the mobile menu is open.
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     };
   }, [isMobileMenuOpen]);
 
@@ -55,226 +66,165 @@ export default function Header() {
     return null;
   }
 
-  
+  const navLinkClass = (active: boolean) =>
+    `inline-flex h-9 items-center rounded-full px-3.5 text-[0.9375rem] font-medium transition-colors ${
+      active ? 'bg-canvas text-ink' : 'text-muted hover:text-ink'
+    }`;
+
   return (
     <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-white"
+      >
+        Skip to content
+      </a>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled || isHomeDeliveryPage? 'bg-blue-950 dark:bg-black dark:bg-gradient-to-b dark:from-blue-950/70 dark:to-blue-950/70 shadow-md' : 'bg-transparent'
+        className={`sticky top-0 z-50 border-b bg-white/85 backdrop-blur-xl transition-colors duration-300 ${
+          isScrolled || isMobileMenuOpen ? 'border-line' : 'border-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-18">
-            {/* Logo */}
-             <Link href="/" className='cursor-pointer'>
-            <div className="flex gap-0 flex-shrink-0">
-              <Image
-                src="/images/logo-wid.png"
-                alt="Logo"
-                width={55}
-                height={35}
-                priority
-              />
-              <div className='pl-1.5 flex-row gap-0 font-bold inline flex-shrink-0'>
-                <p className='mb-0 leading-tight text-2xl sm:text-2xl text-center text-yellow-500 whitespace-nowrap'>MTA</p>
-                <p className='leading-tight mb-0 font-semibold logo-font text-yellow-500 text-[9px] sm:text-[11px] whitespace-nowrap' style={{lineHeight:'initial'}}>CURRENCY</p>
-                <p className='leading-tight font-semibold logo-font text-yellow-500 text-[9px] sm:text-[11px] whitespace-nowrap'>EXCHANGE</p>
+        <div className="container-page flex h-16 items-center justify-between gap-6 lg:h-[4.5rem]">
+          <Logo onClick={() => setIsMobileMenuOpen(false)} />
+
+          {/* Desktop navigation */}
+          <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
+            <div
+              className="relative"
+              ref={dropdownRef}
+              onMouseEnter={() => setIsDropdownOpen(true)}
+              onMouseLeave={() => setIsDropdownOpen(false)}
+            >
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen((open) => !open)}
+                aria-expanded={isDropdownOpen}
+                aria-haspopup="true"
+                className={`${navLinkClass(isExchangeActive)} cursor-pointer gap-1`}
+              >
+                Currency Exchange
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                  aria-hidden="true"
+                />
+              </button>
+
+              <div
+                className={`absolute left-1/2 top-full w-[26rem] -translate-x-1/2 pt-3 transition-all duration-200 ${
+                  isDropdownOpen ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-1 opacity-0'
+                }`}
+              >
+                <ul className="rounded-2xl border border-line bg-white p-2 shadow-float">
+                  {nav.exchange.map((item) => (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className={`group flex items-start justify-between gap-4 rounded-xl px-4 py-3 transition-colors hover:bg-canvas ${
+                          isActive(item.href) ? 'bg-canvas' : ''
+                        }`}
+                      >
+                        <span>
+                          <span className="block text-[0.9375rem] font-medium text-ink">{item.name}</span>
+                          <span className="mt-0.5 block text-sm text-muted">{item.description}</span>
+                        </span>
+                        <ArrowUpRight
+                          className="mt-0.5 h-4 w-4 shrink-0 text-subtle transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink"
+                          aria-hidden="true"
+                        />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
-            </Link>
 
-            {/* Desktop Navigation Buttons (hidden on mobile) */}
-            <nav className="ms-auto flex items-center gap-4"> {/* Changed to flex */}
-              {/* First two buttons - hidden on mobile */}
-              <div className="hidden lg:flex items-center gap-4 flex-shrink-0">
-                {/* Money Exchange Dropdown */}
-                <div className="relative"
-                    ref={dropdownRef}
-                    onMouseEnter={() => setIsDropdownOpen(true)}
-                    onMouseLeave={() => setIsDropdownOpen(false)}>
-                  <button
-                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="px-6 py-2.5 rounded-lg cursor-pointer font-medium transition-all duration-200 bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
-                  >
-                    Money Exchange <ChevronDown className={`text-white/90 inline-block ml-2 w-5 h-5 transition-transform duration-200 ${
-                        isDropdownOpen ? 'rotate-180' : ''
-                      }`} />
-                    
-                  </button>
+            {nav.main.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={navLinkClass(isActive(item.href))}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </nav>
 
-                  {/* Dropdown Menu */}
-                  <div
-                    className={`absolute top-full left-[0] mt-2 w-[320px] bg-white rounded-lg shadow-xl overflow-hidden transition-all duration-300 origin-top ${
-                      isDropdownOpen
-                        ? 'opacity-100 scale-y-100 visible'
-                        : 'opacity-0 scale-y-0 invisible'
-                    }`}
-                  >
-                    <div className="grid grid-cols-1 gap-6 p-6">
-                      {/* Column 1: Currency Exchange */}
-                      <div>
-                        <h3 className="font-bold text-gray-900 mb-3 text-sm uppercase tracking-wide">
-                          Currency Exchange
-                        </h3>
-                        <ul className="space-y-2">
-                          <li>
-                            <a href="/click-and-sell-currency" className="text-gray-600 hover:text-blue-600 transition-colors text-sm block py-1">
-                              Click and Sell
-                            </a>
-                          </li>
-                          <li>
-                            <a href="/click-and-buy-currency" className="text-gray-600 hover:text-blue-600 transition-colors text-sm block py-1">
-                              Click and Buy
-                            </a>
-                          </li>
-                          <li>
-                            <a href="/currency-home-delivery" className="text-gray-600 hover:text-blue-600 transition-colors text-sm block py-1">
-                              Home Delivery
-                            </a>
-                          </li>
-                          <li>
-                            <a href="/money-exchange/currency-exchange-rates" className="text-gray-600 hover:text-blue-600 transition-colors text-sm block py-1">
-                              Exchange Rates
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Money Transfer Button */}
-                <a className="px-6 py-2.5 rounded-lg cursor-pointer font-medium transition-all duration-200 bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
-                  href="/money-transfer"
-                >
-                  Money Transfer
-                </a>
-                <a className="px-6 py-2.5 rounded-lg cursor-pointer font-medium transition-all duration-200 bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
-                  href="/about-mta"
-                >
-                  About MTA
-                </a>
-              </div>
-
-              {/* Contact Us Button - Visible on ALL screens */}
-              <a href="/contact-us" className="whitespace-nowrap cursor-pointer px-6 py-1.5 md:py-2.5 bg-yellow-500 text-gray-900 rounded-lg font-medium hover:bg-yellow-600 transition-all duration-200" >
-                Contact Us
-              </a>
-            </nav>
-            {/* Hamburger Menu Button - Only for mobile/tablet */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden ps-2 text-white rounded-lg focus:outline-none flex-shrink-0"
-              aria-label="Toggle menu"
+          <div className="flex items-center gap-2">
+            <a
+              href={site.phoneHref}
+              className="hidden items-center gap-2 rounded-full px-3 text-sm font-medium text-muted transition-colors hover:text-ink xl:inline-flex"
             >
-                <AlignJustify size={30}/>
-             </button>
+              <Phone className="h-4 w-4" aria-hidden="true" />
+              <span className="tabular">{site.phone}</span>
+            </a>
+            <ButtonLink href="/click-and-buy-currency" size="sm" className="hidden sm:inline-flex">
+              Order currency
+            </ButtonLink>
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen((open) => !open)}
+              className="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-canvas lg:hidden"
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-menu"
+            >
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Side Menu Overlay */}
+      {/* Mobile menu */}
       <div
-        className={`fixed inset-0 z-50 lg:hidden transition-all duration-300 ${
-          isMobileMenuOpen
-            ? 'opacity-100 visible'
-            : 'opacity-0 invisible'
+        id="mobile-menu"
+        className={`fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto bg-white transition-all duration-300 lg:hidden ${
+          isMobileMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'
         }`}
       >
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-black/50"
-          onClick={() => setIsMobileMenuOpen(false)}
-        ></div>
+        <nav className="container-page flex min-h-full flex-col py-6" aria-label="Mobile">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-subtle">Currency Exchange</p>
+          <ul className="mt-2">
+            {nav.exchange.map((item) => (
+              <li key={item.href} className="border-b border-line">
+                <Link href={item.href} className="flex items-center justify-between gap-4 py-4">
+                  <span>
+                    <span className={`block text-lg font-medium ${isActive(item.href) ? 'text-navy-soft' : 'text-ink'}`}>
+                      {item.name}
+                    </span>
+                    <span className="block text-sm text-muted">{item.description}</span>
+                  </span>
+                  <ArrowUpRight className="h-5 w-5 shrink-0 text-subtle" aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
 
-        {/* Side Menu */}
-        <div
-          className={`absolute right-0 top-0 h-full w-80 bg-yellow-500 shadow-xl transform transition-transform duration-300 ${
-            isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-        >
-          {/* Menu Header */}
-          <div className="flex items-center justify-between p-5">
-           
-            <div className="flex gap-2 items-center">
-              <Image
-                src="/images/logo-wid.png"
-                alt="Logo"
-                width={50}
-                height={25}
-                priority
-              />
-            </div>
-            <button
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="p-2 text-black hover:text-gray-700"
-              aria-label="Close menu"
-            >
-            <X size={35}/>
-            </button>
-          </div>
+          <ul className="mt-6">
+            {[...nav.main, ...nav.legal].map((item) => (
+              <li key={item.href} className="border-b border-line">
+                <Link
+                  href={item.href}
+                  className={`block py-4 text-lg font-medium ${isActive(item.href) ? 'text-navy-soft' : 'text-ink'}`}
+                >
+                  {item.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
 
-          {/* Menu Content */}
-          <div className="px-7 overflow-y-auto h-[calc(100%-80px)]">
-            {/* Money Exchange Section */}
-            <div className="mb-8">
-              <h3 className="font-bold text-gray-900 mb-4 text-lg border-b border-yellow-400 pb-1">
-                Money Exchange
-              </h3>
-              <ul className="space-y-3">
-                <li>
-                  <a href="/click-and-sell-currency" className="text-black hover:text-blue-600 transition-colors block px-2 rounded-lg hover:bg-gray-50">
-                    <ChevronRight className='inline' size={15}/> Click and Sell
-                  </a>
-                </li>
-                <li>
-                  <a href="/click-and-buy-currency" className="text-black hover:text-blue-600 transition-colors block px-2 rounded-lg hover:bg-gray-50">
-                    <ChevronRight className='inline' size={15}/> Click and Buy
-                  </a>
-                </li>
-                <li>
-                  <a href="/currency-home-delivery" className="text-black hover:text-blue-600 transition-colors block px-2 rounded-lg hover:bg-gray-50">
-                    <ChevronRight className='inline' size={15}/> Home Delivery
-                  </a>
-                </li>
-                <li>
-                  <a href="/money-exchange/currency-exchange-rates" className="text-black hover:text-blue-600 transition-colors block px-2 rounded-lg hover:bg-gray-50">
-                    <ChevronRight className='inline' size={15}/> Exchange Rates
-                  </a>
-                </li>
-                <li>
-                  <a href="/terms-and-conditions" className="text-black hover:text-blue-600 transition-colors block px-2 rounded-lg hover:bg-gray-50">
-                    <ChevronRight className='inline' size={15}/> Terms & Conditions
-                  </a>
-                </li>
-                <li>
-                  <a href="/privacy-policy" className="text-black hover:text-blue-600 transition-colors block px-2 rounded-lg hover:bg-gray-50">
-                    <ChevronRight className='inline' size={15}/> Privacy Policy
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Additional Links */}
-            <a href="/money-transfer" className="block font-bold text-gray-900 mb-4 text-lg border-b border-yellow-400 pb-1">
-                Money Transfer
+          <div className="mt-auto space-y-5 pt-10">
+            <ButtonLink href="/click-and-buy-currency" size="lg" className="w-full">
+              Order currency
+            </ButtonLink>
+            <div className="flex items-center justify-between">
+              <a href={site.phoneHref} className="tabular text-sm font-medium text-ink">
+                {site.phone}
               </a>
-              <a href="/about-mta" className="block font-bold text-gray-900 mb-4 text-lg border-b border-yellow-400 pb-1">
-                About Us
-              </a>
-              <a href="/contact-us" className="block font-bold text-gray-900 mb-4 text-lg border-b border-yellow-400 pb-1">
-                Contact Us
-              </a>
-       
-
-            {/* Mobile Contact Button (bottom of menu) */}
-            <div className="pt-3 mt-6 ">
-              <p className='text-center py-1 mb-3 bg-yellow-300/30 italic'>Connect With Us</p>
-              <SocialLinks circleClass='bg-white w-10 h-10 md:w-12 md:h-12 ' className='text-black w-6 h-6 md:w-7 md:h-7'/>
-              <a href='mailto:mtworldwidelimited@gmail.com' className='text-sm block text-center py-2'>mtworldwidelimited@gmail.com</a>
+              <SocialLinks />
             </div>
           </div>
-        </div>
+        </nav>
       </div>
     </>
   );

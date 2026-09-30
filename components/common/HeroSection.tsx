@@ -1,66 +1,36 @@
-import Image from 'next/image';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { Eyebrow } from '../ui/SectionHeading';
 
 interface HeroSectionProps {
   heading: string;
-  backgroundImage?: string;
-  description?:string;
+  eyebrow?: string;
+  description?: string;
   children?: ReactNode;
 }
 
-export default function HeroSection({ 
-  heading, 
-  backgroundImage = '/images/hero-bg.jpg',
-  description,
-  children 
-}: HeroSectionProps) {
+// Page header used by every inner page. Kept deliberately quiet so the
+// page content (calculators, rates, contact details) carries the weight.
+export default function HeroSection({ heading, eyebrow, description, children }: HeroSectionProps) {
   return (
-    <div className="px-5 relative bg-black w-full h-[55vh] md:h-[85vh]">
-      {/* Background Image */}
-      <div className="absolute max-w-[85%] mx-auto inset-0">
-        <Image
-          src={backgroundImage}
-          alt="Hero background"
-          fill
-          className=""
-          priority
-        />
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/50"></div>
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full">
-        <h1 className="text-4xl md:text-5xl font-bold text-white text-center pb-4 px-5">
-          {heading}
-        </h1>
-        <p className="block text-sm md:text-lg font-medium text-white text-center pb-10 px-10 lg:px-4">
-          {description}
-        </p>
-      </div>
-
-      {/* Children Content (between image and curve) */}
-      {children && (
-        <div className="absolute bottom-[-90] px-20 z-15">
-          {children}
+    <section className="relative overflow-hidden border-b border-line bg-canvas">
+      <div
+        className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_70%_90%_at_50%_0%,black,transparent)]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -top-32 right-[-10%] h-80 w-80 rounded-full bg-gold/25 blur-3xl"
+        aria-hidden="true"
+      />
+      <div className="container-page relative py-14 sm:py-20">
+        <div className="max-w-2xl animate-fade-up">
+          {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+          <h1 className={`${eyebrow ? 'mt-4' : ''} text-4xl font-semibold leading-[1.05] text-ink sm:text-5xl`}>
+            {heading}
+          </h1>
+          {description && <p className="mt-5 text-lg leading-relaxed text-muted">{description}</p>}
+          {children && <div className="mt-8">{children}</div>}
         </div>
-      )}
-
-      {/* Outward Circle Bottom (Curve) */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 h-24">
-        <svg
-          className="w-full h-full"
-          viewBox="0 0 1440 80"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="none"
-        >
-          <path
-            d="M0 80C240 40 480 40 720 40C960 40 1200 40 1440 80V80H0Z"
-            className='fill-white dark:fill-black'
-          />
-        </svg>
       </div>
-    </div>
+    </section>
   );
 }

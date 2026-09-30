@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '../../../lib/supabase-admin' // or '@/lib/supabase-admin'
 // GET all currency rates
 export async function GET() {
+  // Local preview without Supabase keys: read the public live rates instead.
+  // Only ever runs under `next dev`; production always uses Supabase below.
+  if (process.env.NODE_ENV === 'development' && !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const res = await fetch('https://mtaworldwide.co.uk/api/currency-rates', { cache: 'no-store' })
+      return NextResponse.json(await res.json(), { status: res.status })
+    } catch (error: any) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+  }
+
   try {
     const supabaseAdmin = getSupabaseAdmin() as any
     

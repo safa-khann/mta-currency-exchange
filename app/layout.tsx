@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Montserrat, Playfair_Display } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Providers } from "./providers";
 
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'], // Choose weights you need
-  style: ['normal', 'italic'],
-  variable: '--font-montserrat',
+const geistSans = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
+  display: "swap",
 });
 
-// For headings
-const playfair = Playfair_Display({ 
-  subsets: ['latin'],
-  variable: '--font-heading',
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -58,7 +57,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en-GB">
       <head>
        <script
           type="application/ld+json"
@@ -109,13 +108,11 @@ export default function RootLayout({
           href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" 
         />
       </head>
-      <body
-        className={`${montserrat.variable} ${playfair.variable}`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <Providers>
-        <Header />
-        {children}
-        <Footer/>
+          <Header />
+          <main id="main">{children}</main>
+          <Footer />
         </Providers>
       </body>
     </html>

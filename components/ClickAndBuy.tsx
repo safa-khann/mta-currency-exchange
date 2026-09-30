@@ -1,22 +1,25 @@
-import React from 'react';
-import Image from 'next/image';
 import HeroSection from './common/HeroSection';
 import CurrencyOrderForm from './common/CurrencyOrderForm';
+import Faq from './sections/Faq';
 
 const ClickAndBuy = () => {
-
   return (
-    <div className="min-h-screen">
-      <HeroSection heading="Currency Calculation"/>
+    <>
+      <HeroSection
+        eyebrow="Click & Buy"
+        heading="Buy currency online"
+        description="Reserve your travel money at our bank-beating rates with 0% commission, then collect and pay at our Grays branch."
+      />
       <CurrencyOrderForm
-      heading="Currency Converter"
-      showOption="buy" // Only show "Click and Buy"
-      showPersonalDetails={true}
-      defaultCurrency="USD"
-      showCart={true}
-      isHomePage={false}
-    />
-    </div>
+        heading="Add currency"
+        showOption="buy"
+        showPersonalDetails={true}
+        defaultCurrency="USD"
+        showCart={true}
+        isHomePage={false}
+      />
+      <Faq only={['id', 'payment', 'rate', 'cancel', 'usd1']} />
+    </>
   );
 };
 

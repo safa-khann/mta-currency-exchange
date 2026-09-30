@@ -11,9 +11,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <SessionProvider>
       <AuthChecker>
-        <main>
+        <div>
           {children}
-        </main>
+        </div>
       </AuthChecker>
     </SessionProvider>
   )

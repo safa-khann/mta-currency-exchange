@@ -1,82 +1,98 @@
-import React from 'react';
-import { 
-  MapPin, 
-  Mail, 
-  Phone, 
-  Clock,
-  MessageSquare,
-  Send,
-  MailIcon,
-  MailPlus
-} from 'lucide-react';
-import Link from 'next/link';
+import { ArrowUpRight, Clock, Mail, MapPin, Phone } from 'lucide-react';
 import HeroSection from './common/HeroSection';
 import SocialLinks from './common/SocialLinks';
 import SimpleMap from './MapWidget';
+import { site } from '@/lib/site';
+
+const channels = [
+  {
+    icon: Phone,
+    title: 'Call us',
+    value: site.phone,
+    href: site.phoneHref,
+    note: 'During opening hours',
+  },
+  {
+    icon: Mail,
+    title: 'Email us',
+    value: site.email,
+    href: `mailto:${site.email}`,
+    note: 'We reply as soon as we can',
+  },
+  {
+    icon: MapPin,
+    title: 'Visit us',
+    value: `${site.address.line1}, ${site.address.city} ${site.address.postcode}`,
+    href: site.mapsUrl,
+    note: 'Get directions',
+  },
+];
 
 const ContactPage = () => {
   return (
     <>
-        <HeroSection heading="Contact Us" description='We Cant Wait to Hear From You!'/>
-        {/* Contact Box */}
-        <div className="bg-blue-100/60 mt-5 rounded-2xl mb-10 shadow-equal-md overflow-hidden max-w-md mx-4 sm:mx-auto">
-          <div className="px-3 sm:px-8 pt-6 pb-8">
-            <h2 className='font-bold text-xl sm:text-2xl border-b mb-5 pb-4 text-center'>Get In Touch</h2>
-            {/* Contact Info Grid - Centered */}
-            <div className="grid grid-cols-1  border-b pb-5 gap-8 md:gap-8 justify-items-start ml-0 sm:ml-6">
-              
-              {/* Location */}
-              <div className="flex items-end">
-                <div className="w-10 h-10 rounded-full flex bg-darkbluegray items-center justify-center flex-shrink-0 mr-4">
-                  <MapPin className="w-12 text-blue-900/50" fill='#dbeafe' stroke='#385b8b ' />
+      <HeroSection
+        eyebrow="Contact"
+        heading="We can’t wait to hear from you"
+        description="Questions about rates, orders or money transfers? Call, email or drop into our Grays branch."
+      />
+
+      <section className="section pt-10 sm:pt-14">
+        <div className="container-page">
+          <ul className="grid gap-4 md:grid-cols-3">
+            {channels.map(({ icon: Icon, title, value, href, note }) => (
+              <li key={title}>
+                <a
+                  href={href}
+                  {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  className="group flex h-full flex-col rounded-card border border-line bg-white p-7 transition-[border-color,box-shadow] duration-300 hover:border-ink/15 hover:shadow-card"
+                >
+                  <div className="flex items-start justify-between">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-canvas text-navy transition-colors group-hover:bg-gold">
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <ArrowUpRight
+                      className="h-5 w-5 text-subtle transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <h2 className="mt-8 text-sm font-medium text-muted">{title}</h2>
+                  <p className="tabular mt-1 break-words text-lg font-semibold text-ink">{value}</p>
+                  <p className="mt-auto pt-4 text-sm text-subtle">{note}</p>
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_2fr]">
+            <div className="flex flex-col rounded-card bg-ink p-7 text-white">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10">
+                <Clock className="h-5 w-5 text-gold" aria-hidden="true" />
+              </span>
+              <h2 className="mt-8 text-sm font-medium text-white/60">Opening hours</h2>
+              <dl className="mt-3 space-y-3">
+                <div className="flex justify-between gap-4 border-b border-white/10 pb-3">
+                  <dt className="font-medium">{site.hours.days}</dt>
+                  <dd className="tabular text-white/80">{site.hours.time}</dd>
                 </div>
-                <div className="flex flex-col text-start">
-                  <h3 className="text-md sm:text-xl font-bold text-gray-900 mb-0">Location</h3>
-                  <a  href=''className="text-sm text-gray-800 leading-tight">
-                    54-56 High St, Grays RM17 6NA, UK
-                  </a>
+                <div className="flex justify-between gap-4">
+                  <dt className="font-medium">{site.hours.closed}</dt>
+                  <dd className="text-white/80">Closed</dd>
                 </div>
-              </div>
-              
-              {/* Email */}
-              <div className="flex items-start">
-                <div className="w-10 h-10 rounded-full bg-darkbluegray flex items-center justify-center flex-shrink-0 mr-4" >
-                  <MailPlus className="w-6 text-blue-900/60" fill='#385b8b' stroke='#dbeafe' />
-                </div>
-                <div className="flex flex-col text-start">
-                  <h3 className="text-md sm:text-xl font-bold text-gray-900 mb-0">Email Us</h3>
-                  <a href='mailto:mtaworldwidelimited@gmail.com' className="text-sm text-gray-800 leading-tight">
-                    mtaworldwidelimited@gmail.com
-                  </a>
-                </div>
-              </div>
-              
-              {/* Call Us */}
-              <div className="flex items-start">
-                <div className="w-10 h-10 rounded-full bg-darkbluegray flex items-center justify-center flex-shrink-0 mr-4">
-                  <Phone className="w-8 " fill='#dbeafe' stroke='#385b8b'/>
-                </div>
-                <div className="flex flex-col text-start">
-                  <h3 className="text-md sm:text-xl font-bold text-gray-900 mb-0">Call Us</h3>
-                  <a href='tel:+441375413554' className="text-sm text-gray-800 leading-tight">
-                    +44 1375 413554
-                  </a>
+              </dl>
+              <div className="mt-auto pt-10">
+                <h2 className="text-sm font-medium text-white/60">Follow us</h2>
+                <div className="mt-3">
+                  <SocialLinks tone="dark" />
                 </div>
               </div>
             </div>
-            </div></div>
+            <SimpleMap />
+          </div>
+        </div>
+      </section>
+    </>
+  );
+};
 
-            <h2 className='text-center font-bold mt-2 mb-4 text-xl sm:text-2xl'>Follow Our Social Media</h2>
-            <SocialLinks className='w-5 h-5 text-white' circleClass='bg-darkbluegray w-8 h-8 '/>
-
-            <div className='text-center bg-yellow-500/30 my-12 py-6 sm:py-15 sm:px-4'>
-            <h2 className='text-center font-bold mb-5 text-xl sm:text-3xl'>Working Hours</h2>
-            <p className='text-center font-bold text-md sm:text-xl inline'>Monday to Saturday: </p><span className='text-sm sm:text-xl font-medium block sm:inline'> 9:00am to 6:00pm</span>
-            </div>
-            <h2 className='text-center font-bold text-xl sm:text-3xl mt-8 mb-6'>Locate Us</h2>
-            <SimpleMap/>
-            <div className='w-full bg-white mt-[-18px] h-10 absolute z-80 mb-20'></div>
-            </>
-);}
 export default ContactPage;
-            
