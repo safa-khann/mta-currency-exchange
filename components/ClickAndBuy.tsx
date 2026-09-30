@@ -1,6 +1,7 @@
 import HeroSection from './common/HeroSection';
 import CurrencyOrderForm from './common/CurrencyOrderForm';
 import Faq from './sections/Faq';
+import PhoneMockup from './visuals/PhoneMockup';
 
 const ClickAndBuy = () => {
   return (
@@ -8,6 +9,8 @@ const ClickAndBuy = () => {
       <HeroSection
         eyebrow="Click & Buy"
         heading="Buy currency online"
+        highlight="currency"
+        visual={<PhoneMockup code="USD" mode="buy" className="scale-90 sm:scale-100" />}
         description="Reserve your travel money at our bank-beating rates with 0% commission, then collect and pay at our Grays branch."
       />
       <CurrencyOrderForm

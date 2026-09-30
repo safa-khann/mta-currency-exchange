@@ -28,6 +28,7 @@ function LogoRow({ label, logos }: { label: string; logos: typeof partners }) {
               alt={logo.alt}
               width={logo.width}
               height={logo.height}
+              loading="eager"
               className={`${logo.className} w-auto object-contain opacity-70 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0`}
             />
           </li>

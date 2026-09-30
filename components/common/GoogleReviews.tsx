@@ -2,10 +2,10 @@
 
 // Google Places API reviews are disabled — static reviews are used instead.
 // The server action in app/action/GoogleReviews.ts is kept for when it is re-enabled.
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Star } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, ArrowRight, Quote, Star } from 'lucide-react';
 import { buttonClasses } from '../ui/Button';
-import SectionHeading from '../ui/SectionHeading';
+import { Eyebrow } from '../ui/SectionHeading';
 import { site } from '@/lib/site';
 
 interface Review {
@@ -65,10 +65,21 @@ const STATIC_REVIEWS: Review[] = [
 // Featured on the site: the reviews that say something specific.
 const FEATURED_MIN_LENGTH = 26;
 const FEATURED_REVIEWS = STATIC_REVIEWS.filter((review) => review.text.text.length >= FEATURED_MIN_LENGTH);
+const RATING = 5;
 
-function Stars({ rating, className = 'h-4 w-4' }: { rating: number; className?: string }) {
+// Decorative initials floating around the quote (desktop only).
+const FLOATERS = [
+  { pos: 'left-[6%] top-[8%]', size: 'h-20 w-20 text-2xl', tone: 'bg-gold text-ink' },
+  { pos: 'left-[2%] top-[52%]', size: 'h-14 w-14 text-lg', tone: 'bg-ink text-gold' },
+  { pos: 'left-[12%] bottom-[4%]', size: 'h-24 w-24 text-3xl', tone: 'bg-navy-soft text-frost' },
+  { pos: 'right-[5%] top-[4%]', size: 'h-24 w-24 text-3xl', tone: 'bg-ink text-frost' },
+  { pos: 'right-[10%] top-[48%]', size: 'h-16 w-16 text-xl', tone: 'bg-gold text-ink' },
+  { pos: 'right-[3%] bottom-[8%]', size: 'h-14 w-14 text-lg', tone: 'bg-navy-soft text-gold' },
+];
+
+function Stars({ rating, className = 'h-5 w-5' }: { rating: number; className?: string }) {
   return (
-    <span className="flex gap-0.5" aria-label={`${rating} out of 5 stars`}>
+    <span className="flex gap-1" aria-label={`${rating} out of 5 stars`}>
       {[...Array(5)].map((_, i) => (
         <Star
           key={i}
@@ -82,88 +93,84 @@ function Stars({ rating, className = 'h-4 w-4' }: { rating: number; className?: 
 
 export default function GoogleReviews({ placeId }: GoogleReviewsProps) {
   const reviews = FEATURED_REVIEWS;
-  const rating = 5;
-  const [canPrev, setCanPrev] = useState(false);
-  const [canNext, setCanNext] = useState(true);
-  const trackRef = useRef<HTMLUListElement>(null);
-
-  const updateArrows = useCallback(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    setCanPrev(track.scrollLeft > 4);
-    setCanNext(track.scrollLeft + track.clientWidth < track.scrollWidth - 4);
-  }, []);
-
-  useEffect(() => {
-    updateArrows();
-    window.addEventListener('resize', updateArrows);
-    return () => window.removeEventListener('resize', updateArrows);
-  }, [reviews, updateArrows]);
-
-  const scrollByCard = (direction: 1 | -1) => {
-    const track = trackRef.current;
-    const card = track?.firstElementChild as HTMLElement | null;
-    if (!track || !card) return;
-    track.scrollBy({ left: direction * (card.offsetWidth + 16), behavior: 'smooth' });
-  };
+  const [index, setIndex] = useState(0);
 
   if (reviews.length === 0) {
     return null;
   }
 
-  const arrowClass =
-    'flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-line bg-white text-ink transition-colors hover:border-ink disabled:cursor-default disabled:opacity-35 disabled:hover:border-line';
+  const review = reviews[index];
+  const go = (next: number) => setIndex((next + reviews.length) % reviews.length);
+  const floaterNames = reviews.filter((_, i) => i !== index).slice(0, FLOATERS.length);
 
   return (
-    <div data-place-id={placeId}>
-      <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-        <SectionHeading
-          eyebrow="Reviews"
-          title="Trusted by customers across Grays"
-          description={
-            <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <span className="font-semibold text-ink">{rating.toFixed(1)}</span>
-              <Stars rating={rating} />
-              <span>on Google</span>
+    <div data-place-id={placeId} className="relative">
+      {FLOATERS.map((f, i) => (
+        <span
+          key={f.pos}
+          className={`absolute hidden animate-float items-center justify-center rounded-full font-semibold shadow-float lg:flex ${f.pos} ${f.size} ${f.tone}`}
+          style={{ animationDelay: `${i * 0.7}s` }}
+          aria-hidden="true"
+        >
+          {floaterNames[i]?.authorAttribution.displayName.charAt(0).toUpperCase()}
+        </span>
+      ))}
+
+      <div className="relative mx-auto max-w-3xl text-center">
+        <Eyebrow>Google reviews</Eyebrow>
+        <h2 className="text-headline mt-6 text-ink">What customers say about MTA</h2>
+        <div className="mt-6 flex items-center justify-center gap-3 text-muted">
+          <span className="text-xl font-semibold text-ink">{RATING.toFixed(1)}</span>
+          <Stars rating={RATING} />
+          <span>on Google</span>
+        </div>
+
+        <figure className="mt-14" aria-live="polite">
+          <Quote className="mx-auto h-10 w-10 fill-gold text-gold" aria-hidden="true" />
+          <blockquote
+            key={index}
+            className="mt-6 min-h-[7.5rem] animate-fade-up text-2xl font-medium leading-snug tracking-[-0.02em] text-ink sm:text-3xl"
+          >
+            “{review.text.text.replace(/\s*…$/, '')}”
+          </blockquote>
+          <figcaption className="mt-8 inline-flex items-center gap-3 rounded-full py-2 pl-2 pr-6 ring-1 ring-inset ring-ink/15">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-ink font-semibold text-gold">
+              {review.authorAttribution.displayName.charAt(0).toUpperCase()}
             </span>
-          }
-        />
-        <div className="flex items-center gap-3">
-          <a href={site.reviewsUrl} target="_blank" rel="noopener noreferrer" className={buttonClasses('secondary', 'md')}>
+            <span className="text-left">
+              <span className="block font-semibold text-ink">{review.authorAttribution.displayName}</span>
+              <span className="block text-xs text-muted">Verified Google review</span>
+            </span>
+          </figcaption>
+        </figure>
+
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <div className="flex items-center gap-1 rounded-full bg-ink p-1.5">
+            <button
+              type="button"
+              onClick={() => go(index - 1)}
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-frost transition-colors hover:bg-frost/10"
+              aria-label="Previous review"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+            <span className="tabular min-w-20 px-2 text-sm font-semibold text-frost">
+              <span className="text-gold">{String(index + 1).padStart(2, '0')}</span> / {String(reviews.length).padStart(2, '0')}
+            </span>
+            <button
+              type="button"
+              onClick={() => go(index + 1)}
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-gold text-ink transition-colors hover:bg-white"
+              aria-label="Next review"
+            >
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+          <a href={site.reviewsUrl} target="_blank" rel="noopener noreferrer" className={buttonClasses('secondary', 'md', 'h-[3.25rem]')}>
             Write a review
           </a>
-          <button type="button" className={arrowClass} onClick={() => scrollByCard(-1)} disabled={!canPrev} aria-label="Previous reviews">
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <button type="button" className={arrowClass} onClick={() => scrollByCard(1)} disabled={!canNext} aria-label="Next reviews">
-            <ArrowRight className="h-4 w-4" />
-          </button>
         </div>
       </div>
-
-      <ul
-        ref={trackRef}
-        onScroll={updateArrows}
-        className="scrollbar-none -mx-5 mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-px-5 px-5 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:scroll-px-0 lg:px-0"
-      >
-        {reviews.map((review, index) => (
-          <li
-            key={index}
-            className="flex w-[85%] shrink-0 snap-start flex-col rounded-card border border-line bg-white p-6 sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-2rem)/3)]"
-          >
-            <Stars rating={review.rating} />
-            <blockquote className="mt-4 flex-1 text-[0.9375rem] leading-relaxed text-ink">
-              “{review.text.text.replace(/\s*…$/, '')}”
-            </blockquote>
-            <div className="mt-6 flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-canvas text-sm font-semibold text-navy-soft">
-                {review.authorAttribution.displayName.charAt(0).toUpperCase()}
-              </span>
-              <span className="text-sm font-medium text-ink">{review.authorAttribution.displayName}</span>
-            </div>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

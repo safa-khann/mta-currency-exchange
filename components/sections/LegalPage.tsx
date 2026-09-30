@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import HeroSection from '../common/HeroSection';
+import { LegalDoc } from '../visuals/Illustrations';
 
 export interface LegalSection {
   id: string;
@@ -19,7 +20,7 @@ export default function LegalPage({
 }) {
   return (
     <>
-      <HeroSection eyebrow="Legal" heading={heading} description={description} />
+      <HeroSection eyebrow="Legal" heading={heading} description={description} visual={<LegalDoc className="mx-auto w-full max-w-xs lg:max-w-sm" />} />
       <section className="section pt-12 sm:pt-16">
         <div className="container-page grid gap-12 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-20">
           <nav aria-label="On this page" className="hidden lg:block">

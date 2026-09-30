@@ -1,68 +1,130 @@
 @import "tailwindcss";
 
 /* ------------------------------------------------------------------
-   MTA design tokens
-   Navy + gold come from the logo. Gold is an accent only: it is used
-   for fills behind dark text, never as text on white (contrast).
+   MTA design system
+   Deep navy is the brand field; gold (from the logo) is the loud accent.
+   Gold is used as a fill or as text on navy — never as text on white.
 ------------------------------------------------------------------- */
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  --color-ink: #0b1233;
-  --color-navy: #14215c;
-  --color-navy-soft: #26378a;
-  --color-gold: #f5c21b;
-  --color-gold-deep: #e0ab00;
-  --color-gold-tint: #fff7da;
-  --color-muted: #5b6280;
-  --color-subtle: #8a90a8;
-  --color-line: #e6e8f0;
-  --color-canvas: #f6f7fb;
-  --color-positive: #0f7b4d;
-  --color-danger: #c62f2f;
+  /* Navy field */
+  --color-abyss: #050a24;
+  --color-ink: #0a1233;
+  --color-navy: #111d52;
+  --color-navy-soft: #1d2d78;
+  --color-navy-line: #22306b;
+  --color-frost: #e9eeff;
 
-  --radius-card: 1.25rem;
+  /* Gold accent */
+  --color-gold: #f7c21a;
+  --color-gold-deep: #e2aa00;
+  --color-gold-tint: #fff5d1;
 
-  --shadow-card: 0 1px 2px rgb(11 18 51 / 0.04), 0 8px 24px -12px rgb(11 18 51 / 0.12);
-  --shadow-float: 0 1px 2px rgb(11 18 51 / 0.05), 0 24px 48px -20px rgb(11 18 51 / 0.25);
+  /* Light surfaces */
+  --color-paper: #f4f2ec;
+  --color-canvas: #f7f7fa;
+  --color-line: #e3e4ea;
+  --color-muted: #5b6180;
+  --color-subtle: #8a8fa6;
 
-  --animate-fade-up: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --color-positive: #13a36a;
+  --color-danger: #d23b3b;
+
+  --radius-card: 1.5rem;
+
+  --shadow-card: 0 1px 2px rgb(5 10 36 / 0.05), 0 12px 32px -16px rgb(5 10 36 / 0.18);
+  --shadow-float: 0 2px 4px rgb(5 10 36 / 0.08), 0 30px 60px -24px rgb(5 10 36 / 0.45);
+  --shadow-glow: 0 0 0 1px rgb(247 194 26 / 0.35), 0 18px 50px -12px rgb(247 194 26 / 0.45);
+
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-spin-slow: spin 60s linear infinite;
+  --animate-spin-slow-reverse: spin-reverse 60s linear infinite;
 
   @keyframes fade-up {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(14px); }
     to { opacity: 1; transform: none; }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes spin-reverse {
+    to { transform: rotate(-360deg); }
   }
 }
 
-/* Layout container used by every section. */
 @utility container-page {
   width: 100%;
-  max-width: 76rem;
+  max-width: 80rem;
   margin-inline: auto;
   padding-inline: 1.25rem;
-  @media (width >= 40rem) { padding-inline: 1.5rem; }
-  @media (width >= 64rem) { padding-inline: 2rem; }
+  @media (width >= 40rem) { padding-inline: 1.75rem; }
+  @media (width >= 64rem) { padding-inline: 2.5rem; }
 }
 
-/* Vertical rhythm shared by every page section. */
 @utility section {
-  padding-block: 4.5rem;
-  @media (width >= 48rem) { padding-block: 6rem; }
+  padding-block: 5rem;
+  @media (width >= 48rem) { padding-block: 7.5rem; }
 }
 
-/* Numbers that line up in tables and rate displays. */
+/* Oversized display type — the signature of the brand. */
+@utility text-display {
+  font-size: clamp(3rem, 8.2vw, 7.75rem);
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+  font-weight: 600;
+}
+@utility text-headline {
+  font-size: clamp(2.25rem, 5vw, 4.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  font-weight: 600;
+}
+
 @utility tabular {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
 }
 
-/* Faint grid used behind page heroes. */
+/* Outlined type for the background marquee. */
+@utility text-outline {
+  color: transparent !important;
+  -webkit-text-stroke: 1.5px var(--outline, rgb(233 238 255 / 0.14));
+}
+
+/* Film grain over the navy field. */
+@utility noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+}
+
+/* Hairline grid used behind heroes. */
 @utility bg-grid {
   background-image:
-    linear-gradient(to right, rgb(20 33 92 / 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgb(20 33 92 / 0.06) 1px, transparent 1px);
-  background-size: 48px 48px;
+    linear-gradient(to right, rgb(233 238 255 / 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(233 238 255 / 0.06) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+/* Signature card shape: two concave corners (top-left, bottom-right). */
+@utility notch {
+  --notch: 1.75rem;
+  --notch-mask:
+    radial-gradient(circle var(--notch) at 0 0, #0000 calc(100% - 0.5px), #000) top left / 51% 51% no-repeat,
+    linear-gradient(#000, #000) top right / 51% 51% no-repeat,
+    linear-gradient(#000, #000) bottom left / 51% 51% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 100%, #0000 calc(100% - 0.5px), #000) bottom right / 51% 51% no-repeat;
+  -webkit-mask: var(--notch-mask);
+  mask: var(--notch-mask);
 }
 
 @utility scrollbar-none {
@@ -71,18 +133,16 @@
 }
 
 @layer base {
-  :root {
-    color-scheme: light;
-  }
+  :root { color-scheme: light; }
 
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: 7rem;
   }
 
   body {
-    background: #fff;
+    background: var(--color-abyss);
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
@@ -91,14 +151,14 @@
     overflow-x: clip;
   }
 
+  main { background: #fff; }
+
   h1, h2, h3, h4 {
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     text-wrap: balance;
   }
 
-  p {
-    text-wrap: pretty;
-  }
+  p { text-wrap: pretty; }
 
   ::selection {
     background: var(--color-gold);
@@ -106,47 +166,42 @@
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-navy-soft);
-    outline-offset: 2px;
-    border-radius: 6px;
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 8px;
   }
 
-  /* Remove number spinners on currency inputs. */
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
-  input[type="number"] {
-    -moz-appearance: textfield;
-  }
+  input[type="number"] { -moz-appearance: textfield; }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
   }
 }
 
-/* Long-form legal copy (terms, privacy). */
 @layer components {
   .legal h2 {
-    font-size: 1.25rem;
+    font-size: 1.375rem;
     font-weight: 600;
     color: var(--color-ink);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.875rem;
   }
   .legal p,
   .legal li {
     color: var(--color-muted);
-    line-height: 1.75;
-    font-size: 0.975rem;
+    line-height: 1.8;
+    font-size: 1rem;
   }
-  .legal p + p {
-    margin-top: 0.875rem;
-  }
+  .legal p + p { margin-top: 0.875rem; }
   .legal a {
     color: var(--color-navy-soft);
     text-decoration: underline;
@@ -160,17 +215,15 @@
 
 /* Legacy utilities still used by the admin area. */
 @layer utilities {
-  .bg-grayblue-ll {
-    background-color: #e6eef9;
-  }
-  .logo-font {
-    font-size: 11px;
-  }
+  .bg-grayblue-ll { background-color: #e6eef9; }
+  .logo-font { font-size: 11px; }
   @media (min-width: 768px) {
-    .logo-font {
-      font-size: 9px;
-      font-weight: 600;
-    }
+    .logo-font { font-size: 9px; font-weight: 600; }
   }
 }
 
+/* Travelling dash along the transfer arcs. */
+@keyframes dash {
+  from { stroke-dashoffset: 250; }
+  to { stroke-dashoffset: 0; }
+}

@@ -27,7 +27,7 @@ const services: Record<ServiceKey, { name: string; href: string; description: st
   transfer: {
     name: 'Money Transfer',
     href: '/money-transfer',
-    description: 'Send money to receivers worldwide with MoneyGram, Western Union and Ria — quick and secure.',
+    description: 'Send money worldwide with MoneyGram, Western Union and Ria — quick and secure.',
     icon: Globe2,
   },
   courier: {
@@ -44,32 +44,43 @@ const services: Record<ServiceKey, { name: string; href: string; description: st
   },
 };
 
-export default function ServiceGrid({ only, columns = 4 }: { only: ServiceKey[]; columns?: 3 | 4 }) {
+// Notched service cards. `staggered` offsets alternate cards like a masonry wall.
+export default function ServiceGrid({
+  only,
+  columns = 2,
+  tone = 'dark',
+  staggered = false,
+}: {
+  only: ServiceKey[];
+  columns?: 2 | 3;
+  tone?: 'dark' | 'light';
+  staggered?: boolean;
+}) {
+  const card = tone === 'dark' ? 'bg-frost text-ink' : 'bg-white text-ink';
   return (
-    <ul className={`grid gap-4 sm:grid-cols-2 ${columns === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
-      {only.map((key) => {
+    <ul className={`grid gap-5 sm:grid-cols-2 ${columns === 3 ? 'lg:grid-cols-3' : ''}`}>
+      {only.map((key, index) => {
         const { name, href, description, icon: Icon, badge } = services[key];
         return (
-          <li key={key}>
+          <li key={key} className={staggered && index % 2 === 1 ? 'sm:translate-y-16' : ''}>
             <Link
               href={href}
-              className="group flex h-full flex-col rounded-card border border-line bg-white p-7 transition-[border-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-ink/15 hover:shadow-card"
+              className={`notch group relative flex h-full min-h-72 flex-col rounded-[1.75rem] p-8 transition-colors duration-300 hover:bg-gold ${card}`}
             >
-              <div className="flex items-start justify-between">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-canvas text-navy transition-colors group-hover:bg-gold">
-                  <Icon className="h-5 w-5" aria-hidden="true" />
+              <div className="flex items-start justify-between gap-4">
+                <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-ink text-gold transition-colors duration-300 group-hover:bg-ink">
+                  <Icon className="h-6 w-6" strokeWidth={1.75} aria-hidden="true" />
                 </span>
                 {badge ? (
-                  <span className="rounded-full bg-gold-tint px-2.5 py-1 text-xs font-medium text-ink">{badge}</span>
+                  <span className="rounded-full bg-ink px-3 py-1.5 text-xs font-semibold text-gold">{badge}</span>
                 ) : (
-                  <ArrowUpRight
-                    className="h-5 w-5 text-subtle transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-ink"
-                    aria-hidden="true"
-                  />
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full ring-1 ring-inset ring-ink/15 transition-all duration-300 group-hover:rotate-45 group-hover:bg-ink group-hover:text-gold group-hover:ring-ink">
+                    <ArrowUpRight className="h-5 w-5" aria-hidden="true" />
+                  </span>
                 )}
               </div>
-              <h3 className="mt-8 text-lg font-semibold text-ink">{name}</h3>
-              <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">{description}</p>
+              <h3 className="mt-auto pt-12 text-3xl font-semibold tracking-[-0.035em]">{name}</h3>
+              <p className="mt-3 max-w-sm text-[0.9375rem] leading-relaxed text-ink/65">{description}</p>
             </Link>
           </li>
         );

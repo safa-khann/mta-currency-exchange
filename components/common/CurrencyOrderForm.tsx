@@ -10,6 +10,7 @@ import { CustomSelect } from './CustomSelect';
 import { getFlagCountryCode } from '@/utils/flagMapping';
 import { useCurrencyRates, useOrderEmail } from '@/lib/hooks/useCurrency';
 import { site } from '@/lib/site';
+import { EmptyOrder } from '../visuals/Illustrations';
 
 interface CurrencyOrderFormProps {
   heading: string;
@@ -56,13 +57,13 @@ function Field({
 
 function Step({ index, title, description, children }: { index: number; title: string; description?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-card border border-line bg-white p-5 sm:p-8">
-      <div className="mb-6 flex items-start gap-4">
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-sm font-semibold text-white">
-          {index}
+    <section className="rounded-[1.75rem] bg-white p-5 shadow-card ring-1 ring-line sm:p-9">
+      <div className="mb-7 flex items-start gap-4">
+        <span className="tabular flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ink text-sm font-bold text-gold">
+          0{index}
         </span>
         <div>
-          <h2 className="text-xl font-semibold text-ink">{title}</h2>
+          <h2 className="text-2xl font-semibold tracking-[-0.03em] text-ink">{title}</h2>
           {description && <p className="mt-1 text-sm text-muted">{description}</p>}
         </div>
       </div>
@@ -601,7 +602,7 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
   // ---------------------------------------------------------------
   if (!showPersonalDetails) {
     return (
-      <div className="rounded-card border border-line bg-white p-5 shadow-float sm:p-7">
+      <div className="rounded-[2rem] bg-white p-6 shadow-float ring-1 ring-white/60 sm:p-8">
         <div className="mb-5 flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-ink">{heading}</h2>
           <span className="flex items-center gap-2 text-xs font-medium text-muted">
@@ -624,7 +625,7 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
   let step = 0;
 
   return (
-    <section className="section pt-10 sm:pt-14">
+    <section className="section bg-paper pt-12 sm:pt-16">
       <div className="container-page grid gap-8 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-10">
         <div className="min-w-0 space-y-6">
           <Step index={++step} title={heading} description="Choose a currency and enter either amount — we'll calculate the other.">
@@ -642,7 +643,8 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
                       formErrors.cart ? 'border-danger text-danger' : 'border-line text-muted'
                     }`}
                   >
-                    {formErrors.cart || 'No currencies added yet.'}
+                    <EmptyOrder className="mx-auto mb-3 h-20 w-auto" />
+                    {formErrors.cart || 'No currencies added yet — add one above.'}
                   </div>
                 )}
               </Step>
@@ -852,27 +854,28 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
 
         {/* Summary */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
-          <div className="rounded-card border border-line bg-white p-6">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Order summary</h2>
-            <dl className="mt-4 space-y-3 text-sm">
+          <div className="relative overflow-hidden rounded-[1.75rem] bg-ink p-7 text-frost shadow-float">
+            <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-gold/25 blur-3xl" aria-hidden="true" />
+            <h2 className="relative text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-frost/60">Order summary</h2>
+            <dl className="relative mt-5 space-y-3 text-sm">
               <div className="flex justify-between">
-                <dt className="text-muted">Currencies</dt>
-                <dd className="tabular font-medium text-ink">{filteredCartItems.length}</dd>
+                <dt className="text-frost/60">Currencies</dt>
+                <dd className="tabular font-medium">{filteredCartItems.length}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-muted">Commission</dt>
-                <dd className="font-medium text-positive">£0.00</dd>
+                <dt className="text-frost/60">Commission</dt>
+                <dd className="font-medium text-gold">£0.00</dd>
               </div>
-              <div className="flex items-baseline justify-between border-t border-line pt-3">
-                <dt className="font-medium text-ink">Total (GBP)</dt>
-                <dd className="tabular text-2xl font-semibold text-ink">
+              <div className="flex items-baseline justify-between border-t border-frost/10 pt-4">
+                <dt className="font-medium">Total (GBP)</dt>
+                <dd className="tabular text-3xl font-semibold tracking-tight text-gold">
                   £{totalGbp.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </dd>
               </div>
             </dl>
           </div>
 
-          <div className="mt-4 rounded-card bg-canvas p-6">
+          <div className="mt-4 rounded-[1.75rem] bg-white p-7 ring-1 ring-line">
             <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted">Good to know</h2>
             <ul className="mt-4 space-y-4 text-sm">
               {[
@@ -882,8 +885,10 @@ const CurrencyOrderForm: React.FC<CurrencyOrderFormProps> = ({
                 { icon: IdCard, text: 'Bring valid photo ID' },
                 { icon: ShieldCheck, text: 'Your rate is confirmed by email' },
               ].map(({ icon: Icon, text }) => (
-                <li key={text} className="flex gap-3 text-ink">
-                  <Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
+                <li key={text} className="flex items-center gap-3 text-ink">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-tint">
+                    <Icon className="h-4 w-4 text-ink" aria-hidden="true" />
+                  </span>
                   {text}
                 </li>
               ))}

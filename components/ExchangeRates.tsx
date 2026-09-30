@@ -1,8 +1,13 @@
 'use client'
 
+import { ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
 import HeroSection from './common/HeroSection';
 import { ButtonLink } from './ui/Button';
 import VisitBand from './sections/VisitBand';
+import Flag from './visuals/Flag';
+import RateTicker from './visuals/RateTicker';
+import { HeroWidgets } from './visuals/Widgets';
 import { useCurrencyRates } from '@/lib/hooks/useCurrency';
 import { getFlagCountryCode } from '@/utils/flagMapping';
 import { formatRate } from '@/lib/format';
@@ -20,18 +25,23 @@ const ExchangeRates: React.FC = () => {
       <HeroSection
         eyebrow="Exchange rates"
         heading="Today’s exchange rates"
+        highlight="exchange rates"
         description="Explore MTA’s currency exchange rates for buying and selling. 0% commission, no hidden fees."
+        visual={<HeroWidgets code="EUR" />}
       />
+      <div className="bg-abyss">
+        <RateTicker className="border-y border-frost/10 bg-frost/[0.03]" />
+      </div>
 
-      <section className="section pt-10 sm:pt-14">
+      <section className="section bg-abyss pt-14 text-frost sm:pt-20">
         <div className="container-page">
-          <div className="overflow-hidden rounded-card border border-line bg-white">
-            <div className="flex flex-col gap-1 border-b border-line px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-              <p className="text-sm text-muted">All rates are per £1 GBP.</p>
+          <div className="overflow-hidden rounded-[1.75rem] bg-navy/40 ring-1 ring-inset ring-frost/10">
+            <div className="flex flex-col gap-1 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+              <p className="text-sm text-frost/60">All rates are per £1 GBP.</p>
               {lastUpdated && (
-                <p className="text-sm text-muted">
+                <p className="text-sm text-frost/60">
                   Last updated{' '}
-                  <time dateTime={lastUpdated} className="font-medium text-ink">
+                  <time dateTime={lastUpdated} className="font-semibold text-gold">
                     {new Date(lastUpdated).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </time>
                 </p>
@@ -39,13 +49,13 @@ const ExchangeRates: React.FC = () => {
             </div>
 
             {error ? (
-              <div className="px-5 py-16 text-center sm:px-8">
-                <p className="font-medium text-ink">We couldn’t load the latest rates.</p>
-                <p className="mt-1 text-sm text-muted">Please check your connection and try again.</p>
+              <div className="border-t border-frost/10 px-5 py-16 text-center sm:px-8">
+                <p className="font-semibold">We couldn’t load the latest rates.</p>
+                <p className="mt-1 text-sm text-frost/60">Please check your connection and try again.</p>
                 <button
                   type="button"
                   onClick={() => refetch()}
-                  className="mt-6 h-10 cursor-pointer rounded-full border border-line px-5 text-sm font-medium text-ink hover:border-ink/25"
+                  className="mt-6 h-11 cursor-pointer rounded-full bg-gold px-6 text-sm font-semibold text-ink"
                 >
                   Try again
                 </button>
@@ -53,77 +63,80 @@ const ExchangeRates: React.FC = () => {
             ) : (
               <table className="w-full text-left">
                 <thead>
-                  <tr className="text-xs font-semibold uppercase tracking-[0.12em] text-subtle">
-                    <th scope="col" className="px-5 py-4 font-semibold sm:px-8">
+                  <tr className="bg-gold text-ink">
+                    <th scope="col" className="px-5 py-4 text-sm font-semibold sm:px-8">
                       Currency
                     </th>
-                    <th scope="col" className="px-3 py-4 text-right font-semibold sm:px-8">
+                    <th scope="col" className="px-3 py-4 text-right text-sm font-semibold sm:px-8">
                       We buy
                     </th>
-                    <th scope="col" className="px-5 py-4 text-right font-semibold sm:px-8">
+                    <th scope="col" className="px-3 py-4 text-right text-sm font-semibold sm:px-8">
                       We sell
+                    </th>
+                    <th scope="col" className="hidden w-24 px-8 py-4 sm:table-cell">
+                      <span className="sr-only">Order</span>
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-line border-t border-line">
+                <tbody className="divide-y divide-frost/10">
                   {isLoading
                     ? Array.from({ length: 6 }).map((_, i) => (
                         <tr key={i}>
-                          <td className="px-5 py-5 sm:px-8">
-                            <div className="h-5 w-40 animate-pulse rounded bg-canvas" />
-                          </td>
-                          <td className="px-3 py-5 sm:px-8">
-                            <div className="ml-auto h-5 w-16 animate-pulse rounded bg-canvas" />
-                          </td>
-                          <td className="px-5 py-5 sm:px-8">
-                            <div className="ml-auto h-5 w-16 animate-pulse rounded bg-canvas" />
+                          <td className="px-5 py-6 sm:px-8" colSpan={4}>
+                            <div className="h-6 animate-pulse rounded bg-frost/5" />
                           </td>
                         </tr>
                       ))
                     : exchangeRates.map((rate) => (
-                        <tr key={rate.id} className="transition-colors hover:bg-canvas/60">
+                        <tr key={rate.id} className="group transition-colors hover:bg-frost/[0.04]">
                           <td className="px-5 py-5 sm:px-8">
-                            <div className="flex items-center gap-3">
-                              <span
-                                className={`flag-icon flag-icon-${getFlagCountryCode(rate.currency_code, rate.country_name)} shrink-0 rounded-[3px] text-lg`}
-                                aria-hidden="true"
-                              />
-                              <span className="font-semibold text-ink">{rate.currency_code}</span>
-                              <span className="hidden text-sm text-muted sm:inline">{rate.currency_name}</span>
+                            <div className="flex items-center gap-4">
+                              <Flag country={getFlagCountryCode(rate.currency_code, rate.country_name)} className="[--f:2.25rem] ring-0" />
+                              <div>
+                                <span className="block font-semibold">{rate.currency_code}</span>
+                                <span className="block text-sm text-frost/55">{rate.currency_name}</span>
+                              </div>
                             </div>
                           </td>
-                          <td className="tabular px-3 py-5 text-right font-medium text-ink sm:px-8">{formatRate(rate.buy_rate)}</td>
-                          <td className="tabular px-5 py-5 text-right font-medium text-ink sm:px-8">{formatRate(rate.sell_rate)}</td>
+                          <td className="tabular px-3 py-5 text-right text-lg font-medium text-frost/80 sm:px-8">{formatRate(rate.buy_rate)}</td>
+                          <td className="tabular px-3 py-5 text-right text-lg font-semibold text-gold sm:px-8">{formatRate(rate.sell_rate)}</td>
+                          <td className="hidden px-8 py-5 sm:table-cell">
+                            <Link
+                              href="/click-and-buy-currency"
+                              aria-label={`Buy ${rate.currency_name}`}
+                              className="ml-auto flex h-10 w-10 items-center justify-center rounded-full ring-1 ring-inset ring-frost/15 transition-colors group-hover:bg-gold group-hover:text-ink group-hover:ring-gold"
+                            >
+                              <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                            </Link>
+                          </td>
                         </tr>
                       ))}
                 </tbody>
               </table>
             )}
           </div>
+          <p className="mt-5 text-sm text-frost/50">Online rates are indicative. Your rate is confirmed by email when you place an order.</p>
+        </div>
+      </section>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
-            <div className="rounded-card bg-canvas p-7">
-              <h2 className="text-lg font-semibold text-ink">Buying currency?</h2>
-              <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
-                You get the <span className="font-medium text-ink">We sell</span> rate — the amount of currency you receive for each £1.
-              </p>
-              <ButtonLink href="/click-and-buy-currency" className="mt-6">
-                Buy currency
-              </ButtonLink>
-            </div>
-            <div className="rounded-card bg-canvas p-7">
-              <h2 className="text-lg font-semibold text-ink">Selling currency?</h2>
-              <p className="mt-2 text-[0.9375rem] leading-relaxed text-muted">
-                You get the <span className="font-medium text-ink">We buy</span> rate — the amount of currency needed for each £1 you receive.
-              </p>
-              <ButtonLink href="/click-and-sell-currency" variant="secondary" className="mt-6">
-                Sell currency
-              </ButtonLink>
-            </div>
+      <section className="section bg-paper">
+        <div className="container-page grid gap-5 md:grid-cols-2">
+          <div className="notch rounded-[1.75rem] bg-white p-8 sm:p-10">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-muted">Buying currency?</p>
+            <h2 className="mt-5 text-4xl font-semibold tracking-[-0.04em] text-ink">You get our “We sell” rate</h2>
+            <p className="mt-4 leading-relaxed text-muted">The amount of currency you receive for each £1 you pay.</p>
+            <ButtonLink href="/click-and-buy-currency" className="mt-8">
+              Buy currency
+            </ButtonLink>
           </div>
-          <p className="mt-6 text-sm text-subtle">
-            Online rates are indicative. Your rate is confirmed by email when you place an order.
-          </p>
+          <div className="notch rounded-[1.75rem] bg-ink p-8 text-frost sm:p-10">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-frost/60">Selling currency?</p>
+            <h2 className="mt-5 text-4xl font-semibold tracking-[-0.04em]">You get our “We buy” rate</h2>
+            <p className="mt-4 leading-relaxed text-frost/65">The amount of currency needed for each £1 you receive.</p>
+            <ButtonLink href="/click-and-sell-currency" variant="accent" className="mt-8">
+              Sell currency
+            </ButtonLink>
+          </div>
         </div>
       </section>
 
