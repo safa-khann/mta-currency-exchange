@@ -77,7 +77,7 @@
 
 /* Oversized display type — the signature of the brand. */
 @utility text-display {
-  font-size: clamp(3rem, 8.2vw, 7.75rem);
+  font-size: clamp(3rem, 8.2vw, 7.25rem);
   line-height: 0.92;
   letter-spacing: -0.055em;
   font-weight: 600;

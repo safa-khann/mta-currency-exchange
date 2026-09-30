@@ -54,7 +54,7 @@ const ContactPage = () => {
                     </span>
                   </div>
                   <h2 className="mt-auto pt-10 text-sm font-semibold uppercase tracking-[0.16em] text-ink/55">{title}</h2>
-                  <p className="tabular mt-2 break-all text-lg font-semibold tracking-[-0.03em] text-ink sm:text-2xl">{value}</p>
+                  <p className={`tabular mt-2 font-semibold tracking-[-0.03em] text-ink ${value.includes('@') ? 'break-all text-lg lg:text-xl' : 'text-lg sm:text-2xl'}`}>{value}</p>
                   <p className="mt-2 text-sm text-ink/55">{note}</p>
                 </a>
               </li>
